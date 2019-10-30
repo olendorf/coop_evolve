@@ -16,7 +16,7 @@ coop_evolve
 
 
 
-A CLI based applicated that models evolution using game theory and genetic algorithms.
+A CLI driven application to model evolution using game theory and genetic algorithms.
 
 
 * Free software: Apache Software License 2.0

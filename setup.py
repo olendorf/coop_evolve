@@ -26,13 +26,15 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
+        "Programming Language :: Python :: 2",
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="A CLI based applicated that models evolution using game theory and genetic algorithms.",
+    description="A CLI driven application to model evolution using game theory and genetic algorithms.",
     entry_points={
         'console_scripts': [
             'coop_evolve=coop_evolve.cli:main',

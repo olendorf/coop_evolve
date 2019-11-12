@@ -26,6 +26,11 @@ A CLI driven application to model evolution using game theory and genetic algori
 Features
 --------
 
+Requirements
+------------
+
+- Python >= 3.6
+
 * TODO
 
 Credits

@@ -40,6 +40,7 @@ class Reporter:
             dna = Chromosome()
             lengths.append(len(dna.sequence))
             
-        f.write(f"\n\nmean_length (standard deviation):  {statistics.mean(lengths)} " + 
+        f.write(f"\n\nmean_length (standard deviation):  " + \
+                f"{statistics.mean(lengths)} " + \
                 f"({statistics.stdev(lengths)})")
         f.close()

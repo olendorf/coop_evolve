@@ -35,4 +35,10 @@ def test_command_line_interface():
     assert 'coop_evolve.cli.main' in result.output
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    assert 'Show this message and exit.' in help_result.output
+    
+def test_reporter_cli():
+    runner = CliRunner()
+    result = runner.invoke(cli.main, ['report'])
+    assert result.exit_code == 0
+    assert "reporting" in result.output

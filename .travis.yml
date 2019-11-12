@@ -19,7 +19,7 @@ install:
 
 # Command to run tests, e.g. python setup.py test
 script: 
-  - pytest --cov=YourModule/
+  - pytest --cov=coop_evolve/
   - tox
 
 # Assuming you have installed the travis-ci CLI tool, after you

@@ -24,3 +24,4 @@ def report():
     click.echo("I'm reporting")
     reporter = Reporter()
     reporter.generate()
+    return 0

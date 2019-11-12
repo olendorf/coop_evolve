@@ -36,3 +36,9 @@ def test_command_line_interface():
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output
+    
+def test_reporter_cli():
+    runner = CliRunner()
+    result = runner.invoke(cli.main, ['report'])
+    assert result.exit_code == 0
+    assert "reporting" in result.output

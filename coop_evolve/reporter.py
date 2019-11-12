@@ -18,7 +18,7 @@ class Reporter:
         dna = Chromosome()
         cfg = AppSettings()
         
-        if not os.path.exists("reports"):
+        if not os.path.exists("reports"):  # pragma: no cover
             os.makedirs("reports")
             
         f = open( "reports/_" + str(int(time.time())) + ".txt", "w")

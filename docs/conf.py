@@ -159,5 +159,12 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+html_context = {
+    "display_github": True, # Integrate GitHub
+    "github_user": "olendorf", # Username
+    "github_repo": "coop_evolve", # Repo name
+    "github_version": "master", # Version
+}
+
 
 

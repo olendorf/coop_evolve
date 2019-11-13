@@ -1,5 +1,5 @@
 ===========
-coop_evolve
+Coop Evolve
 ===========
 
 
@@ -34,7 +34,8 @@ Requirements
 
 - Python >= 3.6
 
-* TODO
+TODO
+----
 
 Credits
 -------

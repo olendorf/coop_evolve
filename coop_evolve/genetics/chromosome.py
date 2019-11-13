@@ -4,6 +4,7 @@ import random
 
 from app_settings import AppSettings
 from numpy import random as nrand
+from scipy.stats import nbinom
 from scipy.stats import poisson
 
 
@@ -68,6 +69,28 @@ class Chromosome:
             self.sequence = self.sequence[:pos] + \
             random.choice(self.nucleotides()) + \
             self.sequence[pos:]
+            
+    
+    def inversion(self):
+        
+        if(len(self.sequence) <= 1):
+            pos = 0
+        else:
+            pos = random.randint(0, len(self.sequence) - 1)
+            
+        cfg = AppSettings()
+        p = cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+        
+        length = nbinom.rvs(
+            1, 
+            cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+        )
+        
+        self.sequence = self.sequence[:pos] + \
+                        self.sequence[pos:(pos + length)][::-1] + \
+                        self.sequence[(pos + length):]
+        
+
         
         
 

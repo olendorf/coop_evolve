@@ -28,7 +28,7 @@ class TestChromosomeCreation:
            of the expected dna length."""
         chrom = Chromosome()
         assert type(chrom.sequence) is str
-        assert re.match('[abcd*:/?+]*', chrom.sequence)
+        assert re.match('\A[abcd*:/?+]*\z', chrom.sequence)
         
     def test_random_chromosome_length(self):
         """Ensures that random chromosomes are created at the correct average

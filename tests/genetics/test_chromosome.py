@@ -3,6 +3,7 @@
 
 """Tests for `coop_evolve.genetics.chromosome` class."""
 
+import math
 import pytest
 import re
 
@@ -136,7 +137,72 @@ class TestInsertion:
         assert (expected_delta - conf_99) < observed_delta < (expected_delta + conf_99)
         
         
+class TestInversion:
+    """Tests inversion method in chromosome"""
+    
+    def test_inversion_diffs(self):
+        cfg = AppSettings()
+        
+        reps = 1000
+        deltas = []    # observed number of differences
+        
+        for _ in range(0, reps):
+            dna = Chromosome()
+            old_seq = dna.sequence
+            dna.inversion()
+            deltas.append( sum(1 for a, b in zip(old_seq, dna.sequence) if a != b) )
+            
+        pmfs = []
+        expected_deltas = []   # expected differences 
+        
+        # Assumes the length of an inversion is drawn from a negative binomial 
+        # distribution. Calculates the probability of each length until 
+        # 99.99% of the distribution is accounted for. The expected number of 
+        # differences for each length is multiplied by the probability of that length
+        # and the sum of that gives the expected differences overall.
+        k = 0
+        while sum(pmfs) <= 0.9999:
+            pmf = nbinom.pmf(
+                k, 1, 
+                (1 - cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length))
+            )
+            pmfs.append(pmf)
+            
+            diffs = math.floor(k/2) * (1 - 1/len(Chromosome.nucleotides())) * 2
+            expected_deltas.append(pmf * diffs)
+            k += 1
+            
+        expected_delta = sum(expected_deltas)
+        
+        # Since we are multiplying the binomial distribution (probably of differences at 
+        # a given lenght) by a negative binomial distribution (probability of a length)
+        # we must compute the variance of two independent random variables 
+        # is Var(X * Y) = var(x) * var(y) + var(x) * mean(y) + mean(x) * var(y)
+        # http://www.odelama.com/data-analysis/Commonly-Used-Math-Formulas/
+        
+        mean_binom = cfg.genetics.mutation_length
+        var_binom = binom.var(
+            mean_binom, 1/(len(Chromosome.nucleotides()))
+            )
+        
+        mean_nbinom = cfg.genetics.mutation_length
+        var_nbinom = nbinom.var(
+            cfg.genetics.mutation_length, 
+            mean_nbinom/(1 + mean_nbinom)
+        )
+        
+        var = var_binom * var_nbinom + \
+              var_binom * mean_nbinom + \
+              mean_binom * var_nbinom
+              
+        observed_delta = sum(deltas)/reps
+        conf_99 = ((var/reps)**(1/2)) * 5
+        assert expected_delta - conf_99 < observed_delta < expected_delta + conf_99
         
         
         
         
+        
+        
+        
+            

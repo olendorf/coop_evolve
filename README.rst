@@ -7,7 +7,11 @@ coop_evolve
         :target: https://pypi.python.org/pypi/coop_evolve
 
 .. image:: https://travis-ci.com/olendorf/coop_evolve.svg?branch=develop
-    :target: https://travis-ci.com/olendorf/coop_evolve
+        :target: https://travis-ci.com/olendorf/coop_evolve
+    
+.. image:: https://coveralls.io/repos/github/olendorf/coop_evolve/badge.svg?branch=develop
+        :target: https://coveralls.io/github/olendorf/coop_evolve?branch=develop
+
 
 .. image:: https://readthedocs.org/projects/coop-evolve/badge/?version=latest
         :target: https://coop-evolve.readthedocs.io/en/latest/?badge=latest

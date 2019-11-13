@@ -8,6 +8,10 @@ coop_evolve
 
 .. image:: https://travis-ci.com/olendorf/coop_evolve.svg?branch=develop
         :target: https://travis-ci.com/olendorf/coop_evolve
+        
+        
+.. image:: https://travis-ci.org/olendorf/coop_evolve.svg?branch=develop
+        :target: https://travis-ci.com/olendorf/coop_evolve
     
 .. image:: https://coveralls.io/repos/github/olendorf/coop_evolve/badge.svg?branch=develop
         :target: https://coveralls.io/github/olendorf/coop_evolve?branch=develop

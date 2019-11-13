@@ -164,7 +164,6 @@ html_context = {
     "github_user": "olendorf", # Username
     "github_repo": "coop_evolve", # Repo name
     "github_version": "master", # Version
-    "conf_py_path": "docs", # Path in the checkout to the docs root
 }
 
 

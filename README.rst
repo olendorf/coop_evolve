@@ -6,8 +6,8 @@ coop_evolve
 .. image:: https://img.shields.io/pypi/v/coop_evolve.svg
         :target: https://pypi.python.org/pypi/coop_evolve
 
-.. image:: https://img.shields.io/travis/olendorf/coop_evolve.svg
-        :target: https://travis-ci.org/olendorf/coop_evolve
+.. image:: https://travis-ci.com/olendorf/coop_evolve.svg?branch=develop
+    :target: https://travis-ci.com/olendorf/coop_evolve
 
 .. image:: https://readthedocs.org/projects/coop-evolve/badge/?version=latest
         :target: https://coop-evolve.readthedocs.io/en/latest/?badge=latest

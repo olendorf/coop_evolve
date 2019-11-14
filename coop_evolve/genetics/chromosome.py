@@ -24,9 +24,13 @@ class Chromosome:
             self.sequence += random.choice(self.nucleotides())
     
     def substitutions(self):
-        """Randomly changes charcters in the dna according to the poisson 
-           distribution. expected changes length * mutation rate * nonsynomous
-           substitutions."""
+        """
+        Randomly changes charcters in the dna. 
+        
+        The number of substitutions us drawn from the poisson 
+        distribution where mu = chromosome_length * mutation_rate.
+        
+        """
            
         cfg = AppSettings()
         num = poisson.rvs(cfg.genetics.mutation_rate * len(self.sequence))
@@ -37,8 +41,11 @@ class Chromosome:
                             self.sequence[(pos + 1):]
                             
     def deletion(self):
-        """Deletes a random sequence of characters from a random position on the string. 
-           The length is taken from the negative binomial distribution."""
+        """
+        Deletes a random sequence of characters from a random position on the string. 
+           
+        The lengt of the deletion h is taken from the negative binomial distribution.
+        """
            
         # Prevents an out of bounds error for random.randint()
         if(len(self.sequence) == 0):
@@ -54,8 +61,15 @@ class Chromosome:
             
         
     def insertion(self):
-        """Inserts a random length of random nucleotide characters into a sequence
-           at a random location. """
+        """
+        
+        Inserts a random length of random nucleotide characters into a sequence
+        at a random location. 
+        
+        The position of the insertion is uniformly random across the sequence. The length 
+        of the insertion is drawn from the negative binomial distribution.
+        
+        """
            
         if(len(self.sequence) <= 1):
             pos = 0
@@ -72,6 +86,14 @@ class Chromosome:
             
     
     def inversion(self):
+        """
+        Reverses the order of a random slice of the sequence. 
+        
+        The position
+        on the string is randomly chosen from a uniform distribution. The length
+        conforms to the negative binomial distribution.
+        
+        """
         
         if(len(self.sequence) <= 1):
             pos = 0
@@ -89,9 +111,38 @@ class Chromosome:
         self.sequence = self.sequence[:pos] + \
                         self.sequence[pos:(pos + length)][::-1] + \
                         self.sequence[(pos + length):]
+                        
+        
         
 
         
+    @staticmethod
+    def crossover(dna1, dna2):
+        """
+        Swaps slices of sequence between the two sequences. 
+        
+        The number of swaps isinstance
+        drawn from the poisson distribution, the position of each swap is random across the 
+        shortest sequence.
+        
+        Parameters
+        ----------
+        dna1: Chromosome
+            A chromosome to be crosse dover
+        dna2: Chromosome
+            A chromosome to be crossed over
+        """
+        
+        cfg = AppSettings()
+        min_len =  len(min([dna1.sequence, dna2.sequence], key=len)) 
+        num = poisson.rvs(cfg.genetics.crossover_rate * min_len)
+             
+        positions = nrand.randint(0, min_len , size=num)
+        
+        for pos in positions:
+            seq1 = dna1.sequence
+            dna1.sequence = dna1.sequence[:pos] + dna2.sequence[pos:]
+            dna2.sequence = dna2.sequence[:pos] + seq1[pos:]
         
 
     @staticmethod

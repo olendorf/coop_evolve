@@ -9,3 +9,6 @@ genetics:
   # Deletion and insertion lengths need to be the same otherwise
   # Chromosomes will shrink to zero or grow to infinity
   mutation_length: 1       # The mean length of insertion and deletion mutations
+  
+
+  crossover_rate: 0.1     # per character probability a crossover event happens

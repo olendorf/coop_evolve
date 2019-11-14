@@ -28,7 +28,7 @@ class TestChromosomeCreation:
            of the expected dna length."""
         chrom = Chromosome()
         assert type(chrom.sequence) is str
-        assert re.match('\A[abcd*:/?+]*\z', chrom.sequence)
+        assert re.match('[abcd*:/?+]+', chrom.sequence)
         
     def test_random_chromosome_length(self):
         """Ensures that random chromosomes are created at the correct average
@@ -51,8 +51,9 @@ class TestChromosomeCreation:
                 expected_length + conf_99
                 )
         
-class TestChromosomeClassMethods:
+class TestChromosomeHelperMethods:
     """ Tests various class methods form chromosomes"""
+    
     
     def test_nucleotides(self):
         """Tests nucleotide method returns correct value."""
@@ -200,6 +201,47 @@ class TestInversion:
         assert expected_delta - conf_99 < observed_delta < expected_delta + conf_99
         
         
+class TestCrossingOver:
+    """Test crossing over method as Class method"""
+    
+    def test_crossovers_freq(self):
+        """Tests that the number of swaps is as expected"""
+        
+        cfg = AppSettings()
+        
+        reps = 1000
+        deltas = []
+        diffs = []  # Differences between two deltas, should be zero
+        
+        for _ in range(1, reps):
+            dna1 = Chromosome("a"*100)
+            dna2 = Chromosome("b"*100)
+            
+            Chromosome.crossover(dna1, dna2)
+            
+            delta1 = len(re.findall(r"ab", dna1.sequence)) + \
+                     len(re.findall(r"ab", dna1.sequence))
+                     
+                     
+            delta2 = len(re.findall(r"ab", dna2.sequence)) + \
+                     len(re.findall(r"ab", dna2.sequence))
+                 
+            deltas.append(delta1)
+            diffs.append(abs(delta1 - delta2))
+        
+        min_len = len(min([dna1.sequence, dna2.sequence], key=len)) 
+        # Expected delta is the per base crossover rate, mulitplied by the 
+        # probability of the same position getting chosen twice times the
+        # probability either end getting chosen. This still ignores the effect 
+        # of the same position getting chosen four times. (only even hits cause
+        # difrence.s)
+        expected_delta = cfg.genetics.crossover_rate * min_len * ( 1 - 1/min_len ) * (1 - 2/min_len)
+                         
+        var = poisson.var(expected_delta)
+        conf_99 = ((var/reps)**(1/2)) * 6
+        observed_delta = sum(deltas)/reps
+        
+        assert expected_delta - conf_99 < observed_delta < expected_delta + conf_99
         
         
         

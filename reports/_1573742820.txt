@@ -1,0 +1,21 @@
+==========================
+==========================
+==
+== Genetics
+
+nucleotides: abcd/:*+?
+expected length: 20
+
+Examples: 
+:d
+b:+?:?
+?b:d+db??a*?:caa??bc/aad???a::*:+/cc
+b*d+a*b/***b?a
+::d/a/:?*ba/dd:?:+?*+/d*da+c:dc+cabd
+:c*cb+***::*:ab:c+/:a?cb?*:
+a:dba+?/ba/bc?/?///cc:++a+d*+?*c*b?/a/b/+:?bd:a+*d/baacc+d*ca+dabbc+aa+
++b*//cb*+a:bd
+cccb*?ccc*:+**d*da++b:d?/+
+
+
+mean_length (standard deviation):  20.68768768768769 (22.015492781297567)

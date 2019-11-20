@@ -18,7 +18,7 @@ class Chromosome:
         
         cfg = AppSettings()
         self.sequence = ""
-        p = cfg.genetics.chromosome_length/(1 + cfg.genetics.chromosome_length)
+        p = cfg.chromosome_length/(1 + cfg.chromosome_length)
         
         while(random.random() <= p):
             self.sequence += random.choice(self.nucleotides())
@@ -33,7 +33,7 @@ class Chromosome:
         """
            
         cfg = AppSettings()
-        num = poisson.rvs(cfg.genetics.mutation_rate * len(self.sequence))
+        num = poisson.rvs(cfg.mutation_rate * len(self.sequence))
         positions = nrand.randint(0, len(self.sequence), size=num)
         for pos in positions:
             self.sequence = self.sequence[:pos] + \
@@ -54,7 +54,7 @@ class Chromosome:
         pos = random.randint(0, len(self.sequence) - 1)
         
         cfg = AppSettings()
-        p = cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+        p = cfg.mutation_length/(1 + cfg.mutation_length)
         
         while(random.random() <= p):
             self.sequence = self.sequence[:pos] + self.sequence[(pos + 1):]
@@ -77,7 +77,7 @@ class Chromosome:
             pos = random.randint(0, len(self.sequence) - 1)
         
         cfg = AppSettings()
-        p = cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+        p = cfg.mutation_length/(1 + cfg.mutation_length)
             
         while(random.random() <= p):
             self.sequence = self.sequence[:pos] + \
@@ -101,11 +101,11 @@ class Chromosome:
             pos = random.randint(0, len(self.sequence) - 1)
             
         cfg = AppSettings()
-        p = cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+        p = cfg.mutation_length/(1 + cfg.mutation_length)
         
         length = nbinom.rvs(
             1, 
-            cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length)
+            cfg.mutation_length/(1 + cfg.mutation_length)
         )
         
         self.sequence = self.sequence[:pos] + \
@@ -135,7 +135,7 @@ class Chromosome:
         
         cfg = AppSettings()
         min_len =  len(min([dna1.sequence, dna2.sequence], key=len)) 
-        num = poisson.rvs(cfg.genetics.crossover_rate * min_len)
+        num = poisson.rvs(cfg.crossover_rate * min_len)
              
         positions = nrand.randint(0, min_len , size=num)
         
@@ -150,9 +150,15 @@ class Chromosome:
         """Returns all the nucleotides that can be used in a dna string"""
         cfg = AppSettings()
         return(
-            cfg.genetics.behaviors + 
-            cfg.genetics.gene_delimiter + 
-            cfg.genetics.receptor_delimiter + 
-            cfg.genetics.wildcards
+            cfg.behaviors + 
+            cfg.gene_delimiter + 
+            cfg.receptor_delimiter + 
+            cfg.wildcards
             )
+    
+    @staticmethod
+    def default_behavior():
+        """Returns the last nucleotide which is the default behavior."""
+        cfg = AppSettings()
+        return cfg.behaviors[-1]
         

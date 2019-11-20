@@ -7,7 +7,7 @@ import statistics
 import time
 
 from app_settings import AppSettings
-from coop_evolve.genetics.chromosome import Chromosome
+from coop_evolve.chromosome import Chromosome
 
 
 
@@ -28,7 +28,7 @@ class Reporter:
             "==\n"
             "== Genetics\n\n" + 
             "nucleotides: " + dna.nucleotides() + "\n" + 
-            "expected length: " + str(cfg.genetics.chromosome_length) + "\n\n" + 
+            "expected length: " + str(cfg.chromosome_length) + "\n\n" + 
             "Examples: \n"
         )
         for i in range(1, 10):

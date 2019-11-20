@@ -1,14 +1,16 @@
-genetics:
-  behaviors: abcd          # the possible plays an agent can make
-  gene_delimiter: "/"      # separates potential genes
-  receptor_delimiter: ":"  # left side is recepter, right side is effectxor
-  wildcards: "*+?"         # wild card matchers shouldn't need changing
-  chromosome_length: 100   # expected length of randomly generated chromosomes
-  mutation_rate: 0.000001  # per character mutation rate
-  
-  # Deletion and insertion lengths need to be the same otherwise
-  # Chromosomes will shrink to zero or grow to infinity
-  mutation_length: 1       # The mean length of insertion and deletion mutations
-  
-  
-  crossover_rate: 0.05     # per character probability a crossover event happens
+
+behaviors: abcd          # the possible plays an agent can make
+                         # the last behavior is the default
+                         
+gene_delimiter: "/"      # separates potential genes
+receptor_delimiter: ":"  # left side is recepter, right side is effectxor
+wildcards: "*+?"         # wild card matchers shouldn't need changing
+chromosome_length: 100   # expected length of randomly generated chromosomes
+mutation_rate: 0.000001  # per character mutation rate
+
+# Deletion and insertion lengths need to be the same otherwise
+# Chromosomes will shrink to zero or grow to infinity
+mutation_length: 1       # The mean length of insertion and deletion mutations
+
+
+crossover_rate: 0.05     # per character probability a crossover event happens

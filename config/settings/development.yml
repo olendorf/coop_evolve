@@ -14,3 +14,14 @@ mutation_length: 1       # The mean length of insertion and deletion mutations
 
 
 crossover_rate: 0.1     # per character probability a crossover event happens
+
+interaction_length: 10  # Expected number of plays when two agents play a game
+
+# The payoffs for the given behavior matches. The first character is the 
+# opponents play, the second the focal agent. If there is no match
+# the payoff is assumed to be zero.
+payoffs:
+    dd: 3
+    cc: 7
+    dc: 0
+    cd: 10

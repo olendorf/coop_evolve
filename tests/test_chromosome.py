@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `coop_evolve.genetics.chromosome` class."""
+"""Tests for `coop_evolve.chromosome` class."""
 
 import math
 import pytest
@@ -12,7 +12,7 @@ from scipy.stats import binom
 from scipy.stats import nbinom
 from scipy.stats import poisson
 
-from coop_evolve.genetics.chromosome import Chromosome
+from coop_evolve.chromosome import Chromosome
 
 
 class TestChromosomeCreation:
@@ -41,7 +41,7 @@ class TestChromosomeCreation:
             lengths.append(len(chrom.sequence))
         
         mean_length = float(sum(lengths))/len(lengths)
-        expected_length = cfg.genetics.chromosome_length
+        expected_length = cfg.chromosome_length
         
         p = 1 - (expected_length/(1 + expected_length))
         conf_99 =(nbinom.var(1, p)/reps)**(1/2) * 4
@@ -58,6 +58,11 @@ class TestChromosomeHelperMethods:
     def test_nucleotides(self):
         """Tests nucleotide method returns correct value."""
         assert Chromosome.nucleotides() == "abcd/:*+?"
+    
+    def test_default_behavior(self):
+        """Tests that the last nucleotide is default"""
+        cfg = AppSettings()
+        assert Chromosome.default_behavior() == cfg.behaviors[-1]
         
 class TestSubstitutions:
     """Test substitution mutations."""
@@ -81,12 +86,12 @@ class TestSubstitutions:
             deltas.append( sum(1 for a, b in zip(seq, dna.sequence) if a != b) )
             
         # Expand the conf_99 to compensate for repeated mutations in the same place
-        expected_delta = cfg.genetics.mutation_rate * 100 * \
+        expected_delta = cfg.mutation_rate * 100 * \
                          (1 - 1/len(Chromosome.nucleotides()))
                          
         # Because there is a little slop around synonymous substitions I multiply 
         # the confidence by 10 just to limit the number of failing tests.
-        conf_99 = ((poisson.var(cfg.genetics.mutation_rate * 100)/1000)**(1/2)) * 10
+        conf_99 = ((poisson.var(cfg.mutation_rate * 100)/1000)**(1/2)) * 10
         observed_delta = sum(deltas)/reps
         assert (expected_delta - conf_99) < observed_delta < (expected_delta + conf_99)
         
@@ -105,8 +110,8 @@ class TestDeletion:
             dna.deletion()
             deltas.append(init_length - len(dna.sequence))
             
-        expected_delta = cfg.genetics.mutation_length
-        var = nbinom.var(1, cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length))
+        expected_delta = cfg.mutation_length
+        var = nbinom.var(1, cfg.mutation_length/(1 + cfg.mutation_length))
         
         # Because there is a little slop around short strings or positions near the 
         # end of the string, I multiply 
@@ -130,8 +135,8 @@ class TestInsertion:
             dna.insertion()
             deltas.append(len(dna.sequence) - init_length)
             
-        expected_delta = cfg.genetics.mutation_length
-        var = nbinom.var(1, cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length))
+        expected_delta = cfg.mutation_length
+        var = nbinom.var(1, cfg.mutation_length/(1 + cfg.mutation_length))
         
         conf_99 = ((var/reps)**(1/2)) * 4
         observed_delta = (sum(deltas)/reps)
@@ -165,7 +170,7 @@ class TestInversion:
         while sum(pmfs) <= 0.9999:
             pmf = nbinom.pmf(
                 k, 1, 
-                (1 - cfg.genetics.mutation_length/(1 + cfg.genetics.mutation_length))
+                (1 - cfg.mutation_length/(1 + cfg.mutation_length))
             )
             pmfs.append(pmf)
             
@@ -181,14 +186,14 @@ class TestInversion:
         # is Var(X * Y) = var(x) * var(y) + var(x) * mean(y) + mean(x) * var(y)
         # http://www.odelama.com/data-analysis/Commonly-Used-Math-Formulas/
         
-        mean_binom = cfg.genetics.mutation_length
+        mean_binom = cfg.mutation_length
         var_binom = binom.var(
             mean_binom, 1/(len(Chromosome.nucleotides()))
             )
         
-        mean_nbinom = cfg.genetics.mutation_length
+        mean_nbinom = cfg.mutation_length
         var_nbinom = nbinom.var(
-            cfg.genetics.mutation_length, 
+            cfg.mutation_length, 
             mean_nbinom/(1 + mean_nbinom)
         )
         
@@ -235,7 +240,7 @@ class TestCrossingOver:
         # probability either end getting chosen. This still ignores the effect 
         # of the same position getting chosen four times. (only even hits cause
         # difrence.s)
-        expected_delta = cfg.genetics.crossover_rate * min_len * ( 1 - 1/min_len ) * (1 - 2/min_len)
+        expected_delta = cfg.crossover_rate * min_len * ( 1 - 1/min_len ) * (1 - 2/min_len)
                          
         var = poisson.var(expected_delta)
         conf_99 = ((var/reps)**(1/2)) * 6

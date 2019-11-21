@@ -85,6 +85,19 @@ class Agent:
     
     @staticmethod
     def payoff(moves):
+        """ 
+        Gets the payoff from a pair of moves.
+        
+        The payoff for an agent is based in its move and its oppenent's move as
+        defined in setting.yml. The first character in moves is the oppenent's move,
+        the second being the agent's move. If there is no move pair defined in 
+        the settings, zero is returned.in
+        
+        Parameters
+        ----------
+        moves: String
+            The moves by the opponent, then the agent as a character string.
+        """
         cfg = AppSettings()
         
         if moves in cfg.payoffs:

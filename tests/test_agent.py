@@ -89,7 +89,9 @@ class TestAgentInteraction:
                 expected_length + conf_99
                 )
                 
-    def test_interaction_payoffs(self):        
+    def test_interaction_payoffs(self):  
+        """ Test the the payoffs and fitness generated from an interaction are correct."""
+        
         cfg = AppSettings()
         reps = 1000
         

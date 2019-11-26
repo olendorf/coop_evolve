@@ -69,7 +69,7 @@ class Population:
         """
         return self.population[key]
         
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value): # pragma: no cover
         """
         Allows items, slices etc to be assigned (or reassigned). For example
         `pop[0] = Agent()`

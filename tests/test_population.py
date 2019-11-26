@@ -29,6 +29,17 @@ class TestPopulationCreation:
         assert len(population[0]) == 4
         assert len(population[0][1]) == 3
         
+    def test_setting_item(self):
+        width = 5
+        height = 4
+        subpop_size = 3
+        
+        population = Population(width, height, subpop_size)
+        population[0][0][0] = Agent("abcd")
+        
+        assert population[0][0][0].dna.sequence == "abcd"
+        
+        
     def test_random_agents(self):
         """ Test that agents are made randomly when that is wanted"""
         width = 5
@@ -100,7 +111,7 @@ class TestPlayingGame:
         
         
         
-        
+
                
     
         

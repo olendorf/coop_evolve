@@ -72,8 +72,10 @@ class TestPopulationCreation:
         assert population[0][0][0].dna.sequence == "bbbb"
         
 class TestPlayingGame:
+    """ Test aspects of playing the game """
     
     def test_interaction_lengths(self):
+        """ Tests that the interaction length is correct """
         
         cfg = AppSettings()
         
@@ -107,7 +109,102 @@ class TestPlayingGame:
         conf_99 = (var/1000)**(1/2) * 5
         expected_payoff_length = 2 * expected_interactions * expected_interaction_length
         
-        assert (expected_payoff_length - conf_99) < mean_payoff_length < (expected_payoff_length + conf_99)
+        assert (expected_payoff_length - conf_99) < \
+               mean_payoff_length < \
+               (expected_payoff_length + conf_99)
+               
+class TestReproduction:
+    
+    def test_fecundity_relative_fitness(self):
+        """ 
+        Tests that subpopulatons reproduce at the same rate and equally under
+        relative fitness
+        """
+        
+        width = 2
+        height = 2
+        subpop_size = 10
+        
+        population = Population(width, height, subpop_size)
+        
+        fecundity = 2
+        
+        population.reproduce(fecundity)
+        
+        assert len(population[0][0]) == subpop_size * (fecundity + 1)
+        assert len(population[0][0]) == len(population[1][1])
+        
+    def test_relative_fitness_reproduction(self):
+        """ Tests that the agents reproduce corrctly based on their relaive fitness """
+        
+        reps = 1000
+        popsize = 4
+        
+        counts = {"a": 0, "aa": 0, "aaa": 0, "aaaa": 0}
+        for _ in range(reps):
+            population = Population(1,1,popsize)
+            
+            k = 1
+            for agent in population[0][0]:
+                agent.dna.sequence = "a"*k
+                agent.payoffs = [k]
+                k += 1
+            
+            population.reproduce()
+            
+            for i in range(4, 8):
+                counts[population[0][0][i].dna.sequence] += 1
+                
+        var = []
+        for i in range(popsize):
+            var.append(i + 1)
+        var = [i/sum(var) for i in var]
+        expecteds = {}
+        for i in range(popsize):
+            expecteds["a"*(i + 1)] = var[i] * popsize * reps
+        
+        # still not sure how to calculate variance for this. Sixty is closish i think
+        # and doesn't end up with too many failing tests.
+        assert expecteds["aaaa"] - 60 < counts["aaaa"] < expecteds["aaaa"] + 60
+        
+
+    def test_fecundity_absolute_fitness(self):
+        """ Tests that agents reproduce at the correct rate using absolute fitness. """
+        
+        reps = 1000
+        popsize = 4       
+        fecundity = 2
+        popsizes = []
+        for _ in range(reps):
+            population = Population(1, 1, popsize)     
+            k = 1
+            for agent in population[0][0]:
+                agent.dna.sequence = "a"*k
+                agent.payoffs = [k]
+                k += 1
+            
+            population.reproduce(fecundity = fecundity, relative_fitnesses = False)
+            popsizes.append(len(population[0][0]))
+        
+        mean_popsize = sum(popsizes)/len(popsizes)
+        payoffs = sum([1,2,3,4])/4/10
+        expected_popsize = popsize + (payoffs * popsize * fecundity)
+        
+        # Again not sure the variacne, but this is close and results in mostly 
+        # passing tests.
+        assert expected_popsize - 1 < mean_popsize < expected_popsize + 1
+            
+            
+            
+        
+        
+            
+            
+        
+            
+        
+        
+        
         
         
         

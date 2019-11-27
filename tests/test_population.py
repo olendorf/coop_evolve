@@ -193,8 +193,38 @@ class TestReproduction:
         # Again not sure the variacne, but this is close and results in mostly 
         # passing tests.
         assert expected_popsize - 1 < mean_popsize < expected_popsize + 1
+        
             
-            
+class TestMigration:
+    
+    def test_migration_survival(self):
+        reps = 1000
+        popsize = 1
+        width = 11
+        height = 11
+        population = Population(width, height, popsize)
+        
+        
+        
+        population[5][5] = population[5][5] + [Agent() for _ in range(100)]
+        
+        
+        initial_popsize = population.popsize()
+        
+        population.migrate(0.1, 1)
+        
+        assert population.popsize() < initial_popsize
+        
+                
+        
+        
+class TestOtherMethods:
+    
+    def test_popsize(self):
+        population = Population(4, 4, 4)
+        assert population.popsize() == 4 * 4 * 4
+        
+        
             
         
         

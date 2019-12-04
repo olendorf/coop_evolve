@@ -20,10 +20,10 @@ class TestPopulationCreation:
     def test_dimensions(self):
         """ Test the population is of the correct dimensions"""
         width = 5
-        height = 4
+        length = 4
         subpop_size = 3
         
-        population = Population(width, height, subpop_size)
+        population = Population(width, length, subpop_size)
         
         assert len(population.population) == 5
         assert len(population[0]) == 4
@@ -31,10 +31,10 @@ class TestPopulationCreation:
         
     def test_setting_item(self):
         width = 5
-        height = 4
+        length = 4
         subpop_size = 3
         
-        population = Population(width, height, subpop_size)
+        population = Population(width, length, subpop_size)
         population[0][0][0] = Agent("abcd")
         
         assert population[0][0][0].dna.sequence == "abcd"
@@ -43,29 +43,29 @@ class TestPopulationCreation:
     def test_random_agents(self):
         """ Test that agents are made randomly when that is wanted"""
         width = 5
-        height = 4
+        length = 4
         subpop_size = 3
         
-        population = Population(width, height, subpop_size)
+        population = Population(width, length, subpop_size)
         assert population[0][0][0] != population[1][1][1]
         
     def test_specified_sequence(self):
         """Test agents with specific dna sequences can be created """
         width = 5
-        height = 4
+        length = 4
         subpop_size = 3
         
-        population = Population(width, height, subpop_size, sequence = "abcd")
+        population = Population(width, length, subpop_size, sequence = "abcd")
         assert population[0][0][0].dna.sequence == \
                population[1][1][1].dna.sequence
                
     def test_assign_agent(self):
         """ Ensure the __setitem__ method works"""
         width = 5
-        height = 4
+        length = 4
         subpop_size = 3
         
-        population = Population(width, height, subpop_size, sequence = "aaaa")
+        population = Population(width, length, subpop_size, sequence = "aaaa")
         
         population[0][0][0] = Agent("bbbb")
         
@@ -80,17 +80,17 @@ class TestPlayingGame:
         cfg = AppSettings()
         
         width = 10
-        height = 10
+        length = 10
         subpop_size = 10
         
         expected_interactions = 2
         
-        population = Population(width, height, subpop_size)
+        population = Population(width, length, subpop_size)
         
         population.play_game(expected_interactions)
         payoff_lengths = []
         for i in range(width):
-            for j in range(height):
+            for j in range(length):
                 for k in range(subpop_size):
                     payoff_lengths.append(len(population[i][j][k].payoffs))
         mean_payoff_length = sum(payoff_lengths)/1000
@@ -122,10 +122,10 @@ class TestReproduction:
         """
         
         width = 2
-        height = 2
+        length = 2
         subpop_size = 10
         
-        population = Population(width, height, subpop_size)
+        population = Population(width, length, subpop_size)
         
         fecundity = 2
         
@@ -196,13 +196,15 @@ class TestReproduction:
         
             
 class TestMigration:
+    """ Test migration is accurate """
     
     def test_migration_survival(self):
+        """ Tests proper number of agents survive migration """
         reps = 1000
         popsize = 1
         width = 11
-        height = 11
-        population = Population(width, height, popsize)
+        length = 11
+        population = Population(width, length, popsize)
         
         
         
@@ -215,12 +217,41 @@ class TestMigration:
         
         assert population.popsize() < initial_popsize
         
+    def test_migration_distance(self):
+        """ Tests agents move the correct distance on average """
+        reps = 1000
+        popsize = 1
+        width = 11
+        length = 11
+        population = Population(width, length, popsize)
+        
+        population[5][5] = population[5][5] + [Agent() for _ in range(100)]
+        
+        expected_distance = 1
+        population.migrate(1, expected_distance)
+        
+        distances_x = []
+        distances_y = []
+        
+        for i in range(width):
+            for j in range(length):
+                for k in range(len(population[i][j]) - 1):
+                    distances_x.append(abs(i - 5))
+                    distances_y.append(abs(j - 5))
+        mean_x = sum(distances_x)/len(distances_x)
+        mean_y = sum(distances_y)/len(distances_y)
+        
+        conf_99 = (poisson.var(expected_distance)/(reps))**(1/2) * 5
+        
+        assert expected_distance - conf_99 < mean_x < expected_distance + conf_99
+        assert expected_distance - conf_99 < mean_y < expected_distance + conf_99
+        
                 
         
         
 class TestOtherMethods:
-    
     def test_popsize(self):
+        """ Tests popsize returns the correct population size """
         population = Population(4, 4, 4)
         assert population.popsize() == 4 * 4 * 4
         

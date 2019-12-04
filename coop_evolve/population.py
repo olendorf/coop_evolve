@@ -91,7 +91,25 @@ class Population:
         else:
             self.__reproduce_with_absolute_fitness(fecundity)
             
-    def migrate(self, survival, distance):
+    def migrate(self, survival=0.1, distance=1):
+        """
+        If a subpopulation has surplus agents after reproducing they migrate to 
+        nearby subpopulations. 
+        
+        Migrating agents migrate a distance on average too
+        the distance in both x and y drawn from the poisson distribution. Agents also
+        have a survival probability, so that if survival is 0.1, 1 in 10 agents survive
+        migration.
+        
+        Parameters
+        ----------
+        survival: Float, default = 0.1
+            The probability the agent survives migration.
+            
+        distance: Integerm defaykt = 1
+            The average distance an agent moves in both X and Y directions, drawn
+            from the poisson distribution.
+        """
         cfg = AppSettings()
         
         migrants = []

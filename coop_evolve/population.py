@@ -9,6 +9,8 @@ from app_settings import AppSettings
 
 from coop_evolve.agent import Agent
 
+from scipy.stats import poisson
+
 class Population:
     
     def __init__(self, width, height, subpop_size, sequence = None):
@@ -27,6 +29,14 @@ class Population:
             self.population.append(row)
         # needed to make population iterable
         self.population = list(self.population)
+        
+    def popsize(self):
+        popsize = 0
+        for i in range(len(self.population)):
+            for j in range(len(self.population[i])):
+                popsize += len(self.population[i][j])
+        return popsize
+                
         
     def play_game(self, interactions = 1):
         """
@@ -80,6 +90,55 @@ class Population:
             self.__reproduce_with_relative_fitness(fecundity)
         else:
             self.__reproduce_with_absolute_fitness(fecundity)
+            
+    def migrate(self, survival=0.1, distance=1):
+        """
+        If a subpopulation has surplus agents after reproducing they migrate to 
+        nearby subpopulations. 
+        
+        Migrating agents migrate a distance on average too
+        the distance in both x and y drawn from the poisson distribution. Agents also
+        have a survival probability, so that if survival is 0.1, 1 in 10 agents survive
+        migration.
+        
+        Parameters
+        ----------
+        survival: Float, default = 0.1
+            The probability the agent survives migration.
+            
+        distance: Integerm defaykt = 1
+            The average distance an agent moves in both X and Y directions, drawn
+            from the poisson distribution.
+        """
+        cfg = AppSettings()
+        
+        migrants = []
+        for i in range(self.width):
+            row = []
+            for j in range(self.height):
+                row.append([])
+            migrants.append(row)
+            
+        for i in range(self.width):
+            for j in range(self.height):
+                while(len(self.population[i][j]) > self.subpop_size):
+                    index = random.randint(0, len(self.population[i][j]) - 1)
+                    if random.random() < survival:
+                        x = poisson.rvs(distance)
+                        x = i + (x * -1) if random.random() < 0.5 else i + x
+                        y = poisson.rvs(distance)
+                        y = j + (y * -1) if random.random() < 0.5 else j + y
+                        
+                        if x >= 0 and x < len(migrants) and y >= 0 and y < len(migrants[0]):
+                            migrants[x][y].append(self.population[i][j][index])
+                    del self.population[i][j][index]
+                    
+        for i in range(self.width):
+            for j in range(self.height):
+                self.population[i][j] = self.population[i][j] + migrants[i][j]
+                        
+                        
+                        
             
     def __reproduce_with_relative_fitness(self, fecundity):
         

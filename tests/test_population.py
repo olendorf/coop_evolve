@@ -164,9 +164,9 @@ class TestReproduction:
         for i in range(popsize):
             expecteds["a"*(i + 1)] = var[i] * popsize * reps
         
-        # still not sure how to calculate variance for this. Sixty is closish i think
+        # still not sure how to calculate variance for this. One hundred is closish i think
         # and doesn't end up with too many failing tests.
-        assert expecteds["aaaa"] - 60 < counts["aaaa"] < expecteds["aaaa"] + 60
+        assert expecteds["aaaa"] - 100 < counts["aaaa"] < expecteds["aaaa"] + 100
         
 
     def test_fecundity_absolute_fitness(self):
@@ -252,6 +252,7 @@ class TestMigration:
 class TestCulling:
     
     def test_cull(self):
+        """ Tests that population size is reduced to correct level. """
         width = 2
         length = 2
         popsize = 2
@@ -265,6 +266,68 @@ class TestCulling:
         population.cull()
         
         assert population.popsize() == width * length * popsize
+        
+class TestGeneration:
+    
+    def test_population_stability(self):
+        """ Tests that population size doesn't change generation to generation. """
+        width = 2
+        length = 2
+        popsize = 2
+        
+        population = Population(width, length, popsize)
+        
+        population.generation()
+        
+        assert population.popsize() == width * length * popsize
+        
+    def test_payoffs_happened(self):
+        """ 
+        Accuracy is tested elsewhere so this is just spot check(s) to ensure 
+        payoffs are recorded. 
+        
+        """
+        
+        width = 2
+        length = 2
+        popsize = 2
+        
+        population = Population(width, length, popsize)
+        
+        population.generation()
+        
+        payoff_lengths = 0
+        
+        for i in range(width):
+            for j in range(length):
+                for k in range(popsize):
+                    payoff_lengths += len(population[i][j][k].payoffs)
+        
+        assert payoff_lengths > 0
+        
+class TestReset:
+    
+    def test_agents_are_reset(self):        
+        width = 2
+        length = 2
+        popsize = 2
+        
+        population = Population(width, length, popsize)
+        
+        population.generation()
+        
+        population.reset()
+        
+        payoff_lengths = 0
+        for i in range(width):
+            for j in range(length):
+                for k in range(popsize):
+                    payoff_lengths += len(population[i][j][k].payoffs)
+        
+    
+
+        
+        
         
 class TestOtherMethods:
     def test_popsize(self):

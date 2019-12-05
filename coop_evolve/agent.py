@@ -45,11 +45,30 @@ class Agent:
         return Chromosome.default_behavior()
         
     def fitness(self):
+        """ 
+        Calculates the fitness of the agent as the average payoff per game iteration. If the agent
+        has had zero game iterations it returns the average of the scores from the payoff matrix.
+        
+        Returns
+        -------
+        
+        fitness: Float 
+        
+        """
+        
         cfg = AppSettings()
         if len(self.payoffs) == 0:
             return sum(cfg.payoffs.values())/len(cfg.payoffs)
         else:
             return sum(self.payoffs)/len(self.payoffs)
+            
+    def reset(self):
+        """
+        Resets the agent to the expected state at the start of a generation. 
+        
+        """
+        
+        self.payoffs = []
         
     @staticmethod
     def interact(agent1, agent2):

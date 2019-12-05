@@ -31,6 +31,16 @@ class Population:
         self.population = list(self.population)
         
     def popsize(self):
+        """
+        The number of agents currenlty in the populatoin.The
+        
+        Returns
+        -------
+        
+        popsize: Integer 
+        
+        """
+        
         popsize = 0
         for i in range(len(self.population)):
             for j in range(len(self.population[i])):
@@ -137,21 +147,85 @@ class Population:
                 self.population[i][j] = self.population[i][j] + migrants[i][j]
                         
     def cull(self):
+        """
+        Randomly removes agents from subpopulations until they are down to carrying capacity
+        """
         for i in range(self.width):
             for j in range(self.length):
                 while(len(self.population[i][j]) > self.subpop_size):
                     self.population[i][j].pop(
                         random.randrange(len(self.population[i][j])))
                         
+    def generation(self, interactions = 1, 
+                         fecundity = 1, 
+                         relative_fitnesses = True,
+                         migration_distance = 1,
+                         migration_survival = 0.1):
+        """
+        Goes through one full lifecycle of a population.
+        
+        parameters
+        ---------
+        interactions Integer, default = 1
+            The expected number of interactions an agent has in a generation.
+        
+        fecundity: Integer, default = 1
+            The expected number of offspring per agent per generation. 
+            
+        relative_fitnesses: Boolean, default = True
+            If true agents reproduce based on relative fitness. Each subpopuation produces
+            exactly *fecundity* * N offspring. If False, absolute fitness is used, where each
+            agent gets *fecundity* chances to reproduce based on its performance vs the max possible.
+            
+        migration_distance: Integer, default = 1
+            How far in both x and y directions an agent moves if it survives migration.
+            
+        migration_survival: Float, default 0.1
+            If chosen to migrate, the probability an agent survives migration. 
+        """
+        
+        self.play_game(interactions)
+        self.reproduce(fecundity, relative_fitnesses)
+        self.migrate(migration_distance, migration_survival)
+        self.cull()
+        
+    def reset(self):
+        """
+        Resets the population to starting state for the next genration in the simulation.Resets
+        """
+        
+        for i in range(self.width):
+            for j in range(self.length):
+                for k in range(self.subpop_size):
+                    self.population[i][j][k].reset
+                        
             
     def __reproduce_with_relative_fitness(self, fecundity):
+        """
+        Agents reproduce according to relative fitness within its subpopulation. Each 
+        subpopulation produces exactly *fecundity* * *subpop_size* new agents. The probability
+        each agent reproduces is proportianal to its fitness relative the to subpopulations fitness.
+        
+        parameters
+        ---------
+        fecundity: Integer
+            The number of agents produced per agent in a subpopulation.
+        """
         
         for i in range(self.width):
             for j in range(self.length):
                 relative_fitnesses = []
                 for k in range(self.subpop_size):
                     relative_fitnesses.append(self.population[i][j][k].fitness())
-                relative_fitnesses = numpy.cumsum([(i/sum(relative_fitnesses)) for i in relative_fitnesses]).tolist()
+                
+                # Need to protect against dividing by zero if all the payoffs are zero.
+                # Since they are all equal (zero) assume each is equally likely to reproduce
+                if sum(relative_fitnesses) == 0:
+                    relative_fitnesses = numpy.cumsum(
+                        [(1/len(relative_fitnesses)) for _ in range(len(relative_fitnesses))] )
+                else:
+                    relative_fitnesses = numpy.cumsum(
+                        [(f/sum(relative_fitnesses)) for f in relative_fitnesses]).tolist()
                 for _ in range(fecundity * self.subpop_size):
                     index = 0
                     rand = random.random()
@@ -160,6 +234,18 @@ class Population:
                     self.population[i][j].append(copy.deepcopy(self.population[i][j][index]))
                     
     def __reproduce_with_absolute_fitness(self, fecundity):
+        """
+        Agents reproduce using absolute fitness. Each agent gets *fecundity* chances to reproduce. 
+        The probability it reproduces is equal to its fitness/max_possible_fitness. The amount
+        of reproduction in a population depends on the fitness of its agents.amount
+        
+        parameters
+        ----------
+        
+        fecundity: Integer
+            The number of chances each agent is given to reproduce in a population.
+        """
+        
         cfg = AppSettings()
         max_payoff = max(cfg.payoffs.values())
         for i in range(self.width):

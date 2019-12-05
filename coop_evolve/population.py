@@ -13,15 +13,15 @@ from scipy.stats import poisson
 
 class Population:
     
-    def __init__(self, width, height, subpop_size, sequence = None):
+    def __init__(self, width, length, subpop_size, sequence = None):
         self.width = width
-        self.height = height
+        self.length = length
         self.subpop_size = subpop_size
         
         self.population = []
         for i in range(self.width):
             row = []
-            for j in range(self.height):
+            for j in range(self.length):
                 subpop = []
                 for k in range(self.subpop_size):
                     subpop.append(Agent(sequence))
@@ -55,7 +55,7 @@ class Population:
         cfg = AppSettings()
         
         for i in range(self.width):
-            for j in range(self.height):
+            for j in range(self.length):
                 for _ in range(interactions * self.subpop_size):
                     index1 = random.randint(0, (self.subpop_size - 1))
                     index2 = random.randint(0, (self.subpop_size - 1))
@@ -110,17 +110,16 @@ class Population:
             The average distance an agent moves in both X and Y directions, drawn
             from the poisson distribution.
         """
-        cfg = AppSettings()
         
         migrants = []
         for i in range(self.width):
             row = []
-            for j in range(self.height):
+            for j in range(self.length):
                 row.append([])
             migrants.append(row)
             
         for i in range(self.width):
-            for j in range(self.height):
+            for j in range(self.length):
                 while(len(self.population[i][j]) > self.subpop_size):
                     index = random.randint(0, len(self.population[i][j]) - 1)
                     if random.random() < survival:
@@ -134,16 +133,21 @@ class Population:
                     del self.population[i][j][index]
                     
         for i in range(self.width):
-            for j in range(self.height):
+            for j in range(self.length):
                 self.population[i][j] = self.population[i][j] + migrants[i][j]
                         
-                        
+    def cull(self):
+        for i in range(self.width):
+            for j in range(self.length):
+                while(len(self.population[i][j]) > self.subpop_size):
+                    self.population[i][j].pop(
+                        random.randrange(len(self.population[i][j])))
                         
             
     def __reproduce_with_relative_fitness(self, fecundity):
         
         for i in range(self.width):
-            for j in range(self.height):
+            for j in range(self.length):
                 relative_fitnesses = []
                 for k in range(self.subpop_size):
                     relative_fitnesses.append(self.population[i][j][k].fitness())
@@ -159,7 +163,7 @@ class Population:
         cfg = AppSettings()
         max_payoff = max(cfg.payoffs.values())
         for i in range(self.width):
-            for j in range(self.height):
+            for j in range(self.length):
                 popsize = len(self.population[i][j])
                 for _ in range(fecundity):
                     for k in range(popsize):

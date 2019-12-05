@@ -4,6 +4,7 @@
 """Tests for `coop_evolve.population Population` class."""
 
 import pytest
+import random
 
 from app_settings import AppSettings
 
@@ -247,7 +248,22 @@ class TestMigration:
         assert expected_distance - conf_99 < mean_y < expected_distance + conf_99
         
                 
+class TestCulling:
+    
+    def test_cull(self):
+        width = 2
+        length = 2
+        popsize = 2
         
+        population = Population(width, length, popsize)
+        
+        for i in range(width):
+            for j in range(length):
+                population[i][j] += [Agent() for _ in range(random.randint(0, 5))]
+                
+        population.cull()
+        
+        assert population.popsize() == width * length * popsize
         
 class TestOtherMethods:
     def test_popsize(self):

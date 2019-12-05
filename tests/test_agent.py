@@ -178,4 +178,15 @@ class TestPayOff:
     def test_move_not_matched(self):
         assert Agent.payoff("aa") == 0
         
+class TestReset:
+    """ Tests reset method """
+    
+    def test_payoff_reset(self):
+        agent = Agent()
+        agent.payoffs = [1, 2, 3]
+        
+        agent.reset()
+        
+        assert len(agent.payoffs) == 0
+        
         

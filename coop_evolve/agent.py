@@ -18,6 +18,8 @@ class Agent:
         self.dna = Chromosome(sequence)
         self.payoffs = []
         
+        
+        
     def strategy(self):
         """
         Returns a list of (receptor, effector) pairs that represent the agent's 
@@ -69,6 +71,13 @@ class Agent:
         """
         
         self.payoffs = []
+        
+    def mutate(self):
+        self.dna.mutate()
+        
+    @staticmethod
+    def mate(agent1, agent2):
+        Chromosome.crossover(agent1.dna, agent2.dna)
         
     @staticmethod
     def interact(agent1, agent2):

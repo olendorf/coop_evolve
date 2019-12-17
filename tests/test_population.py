@@ -89,6 +89,9 @@ class TestPlayingGame:
         population = Population(width, length, subpop_size)
         
         population.play_game(expected_interactions)
+        
+               
+        assert population.popsize() == width * length * subpop_size
         payoff_lengths = []
         for i in range(width):
             for j in range(length):

@@ -74,6 +74,26 @@ class Population:
                     agent1 = self.population[i][j][index1]
                     agent2 = self.population[i][j][index2]
                     Agent.interact(agent1, agent2)
+                    
+    def mutate(self):
+        for i in range(self.width):
+            for j in range(self.length):
+                for k in range(self.subpop_size):
+                    print(f"{i}, {j}, {k}")
+                    self.population[i][j][k].mutate()
+    def mate(self):
+        cfg = AppSettings()
+        
+        for i in range(self.width):
+            for j in range(self.length):
+                for _ in range(int(round(self.subpop_size * cfg.mating_rate * 0.5))):
+                    index1 = random.randint(0, (self.subpop_size - 1))
+                    index2 = random.randint(0, (self.subpop_size - 1))
+                    while index1 == index2:
+                        index2 = random.randint(0, self.subpop_size - 1)
+                    agent1 = self.population[i][j][index1]
+                    agent2 = self.population[i][j][index2]
+                    Agent.mate(agent1, agent2)
 
     def reproduce(self, fecundity = 1, relative_fitnesses = True):
         """
@@ -100,6 +120,12 @@ class Population:
             self.__reproduce_with_relative_fitness(fecundity)
         else:
             self.__reproduce_with_absolute_fitness(fecundity)
+            
+    def mutations(self):
+        for i in range(self.width):
+            for j in range(self.length):
+                for k in range(self.subpop_size):
+                    self.population[i][j][k].mutations()
             
     def migrate(self, survival=0.1, distance=1):
         """

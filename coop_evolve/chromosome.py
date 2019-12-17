@@ -113,7 +113,12 @@ class Chromosome:
                         self.sequence[pos:(pos + length)][::-1] + \
                         self.sequence[(pos + length):]
                         
-        
+    
+    def mutate(self):
+        self.substitutions()
+        self.insertion()
+        self.deletion()
+        self.inversion()
         
 
         

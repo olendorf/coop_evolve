@@ -38,6 +38,8 @@ class SimulationRun:
         for _ in range(self.generations):
             data = {}
             self.population.play_game()
+            self.population.mutate()
+            # self.population.mate()
             self.population.reproduce()
             self.population.migrate()
             self.population.cull()

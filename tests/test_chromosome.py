@@ -250,6 +250,15 @@ class TestCrossingOver:
         
         
         
+
+class TestMutate:
+    """ Ensures agents go through their genetic mutations """
+    
+    def test_genetic_operators(self):
+        dna = Chromosome("a"*100)
         
+        old_dna = dna.sequence
         
-            
+        dna.mutate()
+        
+        assert dna.sequence != old_dna

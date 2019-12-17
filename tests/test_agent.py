@@ -189,4 +189,23 @@ class TestReset:
         
         assert len(agent.payoffs) == 0
         
+class TestPassThroughMethods:
+    """ Test methods that pass through to chromosome """
+    
+    def test_mutations(self):
+        """ Simple test for agent mutations """
+        agent = Agent("a"*100)
+        agent.mutate()
+        assert agent.dna.sequence != "a"*100
+        
+    def test_mate(self):
+        """ Simple test for mating """
+        agent1 = Agent("a"*100)
+        agent2 = Agent("b"*100)
+        
+        Agent.mate(agent1, agent2)
+        
+        assert agent1.dna.sequence != "a"*100
+
+        
         

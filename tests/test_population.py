@@ -116,6 +116,20 @@ class TestPlayingGame:
         assert (expected_payoff_length - conf_99) < \
                mean_payoff_length < \
                (expected_payoff_length + conf_99)
+    
+    def test_data_collection(self):
+        width = 2
+        length = 2
+        subpop_size = 10
+        
+        population = Population(width, length, subpop_size)
+        
+        data = population.play_game()
+        
+        assert data["a"] > 0
+        assert data["b"] > 0
+        assert data["c"] > 0
+        assert data["d"] > 0
                
 class TestReproduction:
     

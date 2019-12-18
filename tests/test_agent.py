@@ -4,6 +4,7 @@
 """Tests for `coop_evolve.agent Agent` class."""
 
 import pytest
+import re
 
 from app_settings import AppSettings
 
@@ -149,6 +150,15 @@ class TestAgentInteraction:
         assert expected_fitness2 - conf_99 < fitness2 < expected_fitness2 + conf_99
             
                 
+    def test_interaction_data_return(self):
+        cfg = AppSettings()
+        
+        agent1 = Agent("*d:d/*:c/")
+        agent2 = Agent("*:d/")
+        data = Agent.interact(agent1, agent2)
+        
+        assert re.match("^c[d]*", data[0])
+        assert re.match("^[d]*", data[1])
         
             
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from app_settings import AppSettings
+
 from coop_evolve.population import Population
 
 class SimulationRun:
@@ -14,6 +16,8 @@ class SimulationRun:
                        migration_distance = 1,
                        initial_sequence = None
                  ):
+        cfg = AppSettings()             
+                     
         self.generations = generations
         self.width = width
         self.length = length
@@ -23,7 +27,17 @@ class SimulationRun:
         self.migration_distance = migration_distance
         self.initial_sequence = initial_sequence
         
-        self.data = [{}]
+        self.migration_survival = migration_survival
+        self.migration_distance = migration_distance
+        self.initial_sequence = initial_sequence
+        
+        behaviors = {}
+        for i in range(len(cfg.behaviors)):
+            behaviors[cfg.behaviors[i]]: 0
+        
+        self.data = [{
+            "behavior_counts": behaviors
+        }]
         
         self.population = Population(
             width = self.width, 

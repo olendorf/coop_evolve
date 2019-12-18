@@ -110,6 +110,8 @@ class Agent:
             
             agent1.payoffs.append(Agent.payoff(history2[-1] + history1[-1]))
             agent2.payoffs.append(Agent.payoff(history1[-1] + history2[-1]))
+            
+        return [history1, history2]
     
     @staticmethod
     def payoff(moves):

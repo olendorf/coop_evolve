@@ -74,6 +74,7 @@ class Population:
                     agent1 = self.population[i][j][index1]
                     agent2 = self.population[i][j][index2]
                     Agent.interact(agent1, agent2)
+
                     
     def mutate(self):
         for i in range(self.width):

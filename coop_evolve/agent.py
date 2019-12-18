@@ -94,6 +94,11 @@ class Agent:
             One agent to interact
         agent2: Agent
             The other interacting agent. 
+            
+        Returns
+        -------
+        histories <List>:
+            the histories of each agent [history1, history2]
         """
         cfg = AppSettings()
         p = cfg.interaction_length/(1 + cfg.interaction_length)
@@ -104,9 +109,6 @@ class Agent:
         while(random.random() <= p):
             history1 += agent1.response(history2)
             history2 += agent2.response(history1)
-
-            # print(history1)
-            # print(history2)
             
             agent1.payoffs.append(Agent.payoff(history2[-1] + history1[-1]))
             agent2.payoffs.append(Agent.payoff(history1[-1] + history2[-1]))

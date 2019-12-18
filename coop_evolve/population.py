@@ -64,12 +64,13 @@ class Population:
         """
         cfg = AppSettings()
         
-        behavior_counts = {}
-        for i in range(len(cfg.behaviors)):
-            behavior_counts[cfg.behaviors[i]] = 0
+        behavior_counts = []
         
         for i in range(self.width):
             for j in range(self.length):
+                counts = {"x_coord": i, "y_coord": j}
+                for h in range(len(cfg.behaviors)):
+                    counts[cfg.behaviors[h]] = 0
                 for _ in range(interactions * self.subpop_size):
                     index1 = random.randint(0, (self.subpop_size - 1))
                     index2 = random.randint(0, (self.subpop_size - 1))
@@ -78,10 +79,12 @@ class Population:
                     agent1 = self.population[i][j][index1]
                     agent2 = self.population[i][j][index2]
                     histories = Agent.interact(agent1, agent2)
+                    
                     for h in range(len(cfg.behaviors)):
-                        behavior_counts[cfg.behaviors[h]] += \
-                            histories[0].count(cfg.behaviors[h]) + \
-                            histories[1].count(cfg.behaviors[h])
+                        counts[cfg.behaviors[h]] += \
+                            (histories[0] + histories[1]).count(cfg.behaviors[h])
+                    
+                    
                         
                     
         return behavior_counts
@@ -91,7 +94,6 @@ class Population:
         for i in range(self.width):
             for j in range(self.length):
                 for k in range(self.subpop_size):
-                    print(f"{i}, {j}, {k}")
                     self.population[i][j][k].mutate()
     def mate(self):
         cfg = AppSettings()

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
+import math
+import os
 import pytest
+
+from app_settings import AppSettings
 
 from coop_evolve.simulation_run import SimulationRun
 
@@ -41,6 +44,12 @@ class TestSimulationRunCreation:
         
 class TestSimulationRun:
     
+    def teardown_method(self, test_method):
+        try:
+            os.system('rm -rf temp')
+        except:
+            pass
+    
     def test_stable_population_size(self):
         width = 5
         length = 4
@@ -56,3 +65,29 @@ class TestSimulationRun:
         run.run()
         
         assert run.population.popsize() == width * length * subpop_size
+        
+    def test_generation_length(self):
+        cfg = AppSettings()
+        width = 5
+        length = 4
+        subpop_size = 3
+        generations = 100
+        run = SimulationRun(
+            width = width, 
+            length = length, 
+            subpop_size = subpop_size, 
+            generations = generations
+        )
+        
+        run.run()
+        assert len(run.data) == math.floor((generations + cfg.data_frequency)/cfg.data_frequency)
+
+
+class test_data_collection:
+    
+    def test_behavior_data(self):
+        width = 2
+        length = 2
+        subpop_size = 2
+        
+        

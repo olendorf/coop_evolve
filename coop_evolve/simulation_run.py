@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import time
+
 from app_settings import AppSettings
 
 from coop_evolve.population import Population
@@ -31,13 +34,7 @@ class SimulationRun:
         self.migration_distance = migration_distance
         self.initial_sequence = initial_sequence
         
-        behaviors = {}
-        for i in range(len(cfg.behaviors)):
-            behaviors[cfg.behaviors[i]]: 0
-        
-        self.data = [{
-            "behavior_counts": behaviors
-        }]
+        self.data = []
         
         self.population = Population(
             width = self.width, 
@@ -48,16 +45,27 @@ class SimulationRun:
                 
         
     def run(self):
+        cfg = AppSettings()
         
-        for _ in range(self.generations):
-            data = {}
-            self.population.play_game()
+        try:
+            os.makedirs(cfg.data_directory + "/run_" + str(time.time() ))
+        except:
+            os.makedirs(cfg.data_directory + "/run_" + str(time.time() ))
+        
+        for i in range(self.generations + cfg.data_frequency):
+            if (i - 1)%cfg.data_frequency == 0:
+                data = {
+                    "generation": i
+                }
+                data["behavior_counts"] = self.population.play_game()
+            else:
+                self.population.play_game()
             self.population.mutate()
-            # self.population.mate()
+            self.population.mate()
             self.population.reproduce()
             self.population.migrate()
             self.population.cull()
-            self.data.append(data)
-            
+            if (i - 1)%cfg.data_frequency == 0:
+                self.data.append(data)
             
             

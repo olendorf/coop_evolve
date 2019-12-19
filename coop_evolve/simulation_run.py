@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import csv
 import os
 import time
 
@@ -34,7 +35,7 @@ class SimulationRun:
         self.migration_distance = migration_distance
         self.initial_sequence = initial_sequence
         
-        self.data = []
+        # self.data = []
         
         self.population = Population(
             width = self.width, 
@@ -47,17 +48,28 @@ class SimulationRun:
     def run(self):
         cfg = AppSettings()
         
-        try:
-            os.makedirs(cfg.data_directory + "/run_" + str(time.time() ))
-        except:
-            os.makedirs(cfg.data_directory + "/run_" + str(time.time() ))
+        # try:
+        run_dir =  "/run_" + str(time.time() )
+        os.makedirs(cfg.data_directory + run_dir)
+        print(cfg.data_directory + run_dir)
+        headers = ["generation", "x_coord", "y_coord"]
+        for h in range(len(cfg.behaviors)):
+            headers.append(cfg.behaviors[h])
+        with open(cfg.data_directory + run_dir + "/behavior_counts.csv", 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames = headers)
+            writer.writeheader()
+            
+        # # except:
+        # #     os.makedirs(cfg.data_directory + "/run_" + str(time.time() ))
         
         for i in range(self.generations + cfg.data_frequency):
             if (i - 1)%cfg.data_frequency == 0:
-                data = {
-                    "generation": i
-                }
-                data["behavior_counts"] = self.population.play_game()
+                data =  self.population.play_game()
+                with open(cfg.data_directory + run_dir + "/behavior_counts.csv", 'a') as csvfile:
+                    for row in data:
+                        row["generation"] = i
+                        writer = csv.DictWriter(csvfile, fieldnames = headers)
+                        writer.writerow(row)
             else:
                 self.population.play_game()
             self.population.mutate()
@@ -65,7 +77,9 @@ class SimulationRun:
             self.population.reproduce()
             self.population.migrate()
             self.population.cull()
-            if (i - 1)%cfg.data_frequency == 0:
-                self.data.append(data)
+                
+
+        
+        
             
             

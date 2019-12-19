@@ -6,6 +6,7 @@ import os
 import pytest
 
 from app_settings import AppSettings
+from os import listdir
 
 from coop_evolve.simulation_run import SimulationRun
 
@@ -66,11 +67,20 @@ class TestSimulationRun:
         
         assert run.population.popsize() == width * length * subpop_size
         
-    def test_generation_length(self):
+
+class TestDataCollection:
+    
+    def teardown_method(self, test_method):
+        try:
+            os.system('rm -rf temp')
+        except:
+            pass
+    
+    def test_behavior_data(self):
         cfg = AppSettings()
-        width = 5
-        length = 4
-        subpop_size = 3
+        width = 2
+        length = 2
+        subpop_size = 2
         generations = 100
         run = SimulationRun(
             width = width, 
@@ -80,14 +90,12 @@ class TestSimulationRun:
         )
         
         run.run()
-        assert len(run.data) == math.floor((generations + cfg.data_frequency)/cfg.data_frequency)
-
-
-class test_data_collection:
-    
-    def test_behavior_data(self):
-        width = 2
-        length = 2
-        subpop_size = 2
+        
+        dirs = listdir(cfg.data_directory)
+        
+        assert os.path.isdir(cfg.data_directory + "/" + dirs[0])
+        
+        assert os.path.isfile(cfg.data_directory + "/" + dirs[0] + "/behavior_counts.csv")
+        
         
         

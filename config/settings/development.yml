@@ -30,6 +30,7 @@ payoffs:
     dc: 0
     cd: 10
 
-data_frequency: 10 # How often to collect and write data.
+data_frequency: 10               # How often to collect and write data.
 
-data_directory: "temp/data"
+data_directory: "temp/data"     # The direcotry to store data in 
+report_directory: "temp/reports"     # The directory to store reports in 

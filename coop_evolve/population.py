@@ -83,8 +83,7 @@ class Population:
                     for h in range(len(cfg.behaviors)):
                         counts[cfg.behaviors[h]] += \
                             (histories[0] + histories[1]).count(cfg.behaviors[h])
-                    
-                    
+                behavior_counts.append(counts)
                         
                     
         return behavior_counts

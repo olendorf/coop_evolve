@@ -126,10 +126,12 @@ class TestPlayingGame:
         
         data = population.play_game()
         
-        assert data["a"] > 0
-        assert data["b"] > 0
-        assert data["c"] > 0
-        assert data["d"] > 0
+        print(data)
+        
+        assert data[0]["a"] >= 0
+        assert data[1]["x_coord"] == 0
+        assert data[1]["y_coord"] == 1
+        assert data[2]["d"] > 0
                
 class TestReproduction:
     

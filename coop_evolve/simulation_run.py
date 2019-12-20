@@ -51,12 +51,16 @@ class SimulationRun:
         # try:
         run_dir =  "/run_" + str(time.time() )
         os.makedirs(cfg.data_directory + run_dir)
-        print(cfg.data_directory + run_dir)
-        headers = ["generation", "x_coord", "y_coord"]
+        behavior_headers = ["generation", "x_coord", "y_coord"]
         for h in range(len(cfg.behaviors)):
-            headers.append(cfg.behaviors[h])
+            behavior_headers.append(cfg.behaviors[h])
         with open(cfg.data_directory + run_dir + "/behavior_counts.csv", 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames = headers)
+            writer = csv.DictWriter(csvfile, fieldnames = behavior_headers)
+            writer.writeheader()
+        
+        fitness_headers = ["generation", "x_coord", "y_coord", "mean_fitness"]
+        with open(cfg.data_directory + run_dir + "/mean_fitness.csv", 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames = fitness_headers)
             writer.writeheader()
             
         # # except:
@@ -68,13 +72,21 @@ class SimulationRun:
                 with open(cfg.data_directory + run_dir + "/behavior_counts.csv", 'a') as csvfile:
                     for row in data:
                         row["generation"] = i
-                        writer = csv.DictWriter(csvfile, fieldnames = headers)
+                        writer = csv.DictWriter(csvfile, fieldnames = behavior_headers)
                         writer.writerow(row)
             else:
                 self.population.play_game()
             self.population.mutate()
             self.population.mate()
-            self.population.reproduce()
+            if (i - 1)%cfg.data_frequency == 0:
+                data = self.population.reproduce()
+                with open(cfg.data_directory + run_dir + "/mean_fitness.csv", 'a') as csvfile:
+                    for row in data:
+                        row["generation"] = i
+                        writer = csv.DictWriter(csvfile, fieldnames = fitness_headers)
+                        writer.writerow(row)
+            else:
+                self.population.reproduce()
             self.population.migrate()
             self.population.cull()
                 

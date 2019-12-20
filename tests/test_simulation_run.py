@@ -97,5 +97,7 @@ class TestDataCollection:
         
         assert os.path.isfile(cfg.data_directory + "/" + dirs[0] + "/behavior_counts.csv")
         
+        assert os.path.isfile(cfg.data_directory + "/" + dirs[0] + "/mean_fitness.csv")
+        
         
         

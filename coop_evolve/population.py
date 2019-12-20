@@ -130,9 +130,9 @@ class Population:
         """
         
         if(relative_fitnesses):
-            self.__reproduce_with_relative_fitness(fecundity)
+            return self.__reproduce_with_relative_fitness(fecundity)
         else:
-            self.__reproduce_with_absolute_fitness(fecundity)
+            return self.__reproduce_with_absolute_fitness(fecundity)
             
     def mutations(self):
         for i in range(self.width):
@@ -251,11 +251,20 @@ class Population:
             The number of agents produced per agent in a subpopulation.
         """
         
+        data = []
+        
         for i in range(self.width):
             for j in range(self.length):
                 relative_fitnesses = []
                 for k in range(self.subpop_size):
                     relative_fitnesses.append(self.population[i][j][k].fitness())
+                    
+                if sum(relative_fitnesses) == 0:
+                    mean_fitness = 1/len(relative_fitnesses)
+                else:
+                    mean_fitness = sum(relative_fitnesses)/len(relative_fitnesses)
+                    
+                data.append({"x_coord": i, "y_coord": j, "mean_fitness": mean_fitness})
                 
                 # Need to protect against dividing by zero if all the payoffs are zero.
                 # Since they are all equal (zero) assume each is equally likely to reproduce
@@ -272,6 +281,8 @@ class Population:
                         index += 1
                     self.population[i][j].append(copy.deepcopy(self.population[i][j][index]))
                     
+        return data
+                    
     def __reproduce_with_absolute_fitness(self, fecundity):
         """
         Agents reproduce using absolute fitness. Each agent gets *fecundity* chances to reproduce. 
@@ -286,18 +297,24 @@ class Population:
         """
         
         cfg = AppSettings()
+        
+        data = []
+        
         max_payoff = max(cfg.payoffs.values())
         for i in range(self.width):
             for j in range(self.length):
                 popsize = len(self.population[i][j])
-                for _ in range(fecundity):
-                    for k in range(popsize):
+                fitnesses = []
+                for k in range(popsize):
+                    fitnesses.append(self.population[i][j][k].fitness()/max_payoff)
+                    for _ in range(fecundity):
                         if random.random() <= self.population[i][j][k].fitness()/max_payoff:
                             self.population[i][j].append(copy.deepcopy(self.population[i][j][k]))
+                data.append( {"x_coord": i, "y_coord": j, "mean_fitness": (sum(fitnesses)/len(fitnesses))} )
                 
                     
                     
-                        
+        return data                
                     
             
     def __getitem__(self, key):

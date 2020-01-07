@@ -16,6 +16,7 @@ requirements = [
     'app_settings',
     'numpy',
     'scipy',
+    'psycopg2',
     ]
 
 setup_requirements = ['pytest-runner', ]

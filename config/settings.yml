@@ -1,3 +1,8 @@
+database: coop_evolve
+schema: production
+db_user: coop_evolve
+db_password: password
+
 
 behaviors: abcd          # the possible plays an agent can make
                          # the last behavior is the default

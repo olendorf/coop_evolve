@@ -44,13 +44,7 @@ class TestSimulationRunCreation:
         assert len(simulation.population[0][0]) == subpop_size
         
 class TestSimulationRun:
-    
-    def teardown_method(self, test_method):
-        try:
-            os.system('rm -rf temp')
-        except:
-            pass
-    
+
     def test_stable_population_size(self):
         width = 5
         length = 4
@@ -69,15 +63,9 @@ class TestSimulationRun:
         
 
 class TestDataCollection:
-    
-    def teardown_method(self, test_method):
-        try:
-            os.system('rm -rf temp')
-        except:
-            pass
+
     
     def test_behavior_data(self):
-        cfg = AppSettings()
         width = 2
         length = 2
         subpop_size = 2
@@ -91,13 +79,7 @@ class TestDataCollection:
         
         run.run()
         
-        dirs = listdir(cfg.data_directory)
-        
-        assert os.path.isdir(cfg.data_directory + "/" + dirs[0])
-        
-        assert os.path.isfile(cfg.data_directory + "/" + dirs[0] + "/behavior_counts.csv")
-        
-        assert os.path.isfile(cfg.data_directory + "/" + dirs[0] + "/mean_fitness.csv")
+    
         
         
         

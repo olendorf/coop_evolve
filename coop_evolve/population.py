@@ -61,14 +61,36 @@ class Population:
             The number of interactions per agent. If interactions = 2, and there are
             10 agents in the population, then there are 20 interactions and each agent
             is expected to take part in 40 interactions. 
+            
+        Returns
+        -------
+        List[List[Dict]]
+        A tally of how many times each behavior was exhibited by subpopulation.Agent
+        
+        Example (2 by 3 popluation):
+        
+        [
+            [   
+                {'a': 0, 'b': 0, 'c': 16, 'd': 20}, 
+                {'a': 2, 'b': 4, 'c': 0, 'd': 20}, 
+                {'a': 0, 'b': 0, 'c': 0, 'd': 58}
+            ], 
+            [
+                {'a': 0, 'b': 0, 'c': 0, 'd': 96}, 
+                {'a': 22, 'b': 0, 'c': 0, 'd': 98},
+                {'a': 3, 'b': 20, 'c': 0, 'd': 53}
+            ]
+        ]
+        
         """
         cfg = AppSettings()
         
         behavior_counts = []
         
         for i in range(self.width):
+            row = []
             for j in range(self.length):
-                counts = {"x_coord": i, "y_coord": j}
+                counts = {}
                 for h in range(len(cfg.behaviors)):
                     counts[cfg.behaviors[h]] = 0
                 for _ in range(interactions * self.subpop_size):
@@ -83,18 +105,26 @@ class Population:
                     for h in range(len(cfg.behaviors)):
                         counts[cfg.behaviors[h]] += \
                             (histories[0] + histories[1]).count(cfg.behaviors[h])
-                behavior_counts.append(counts)
+                row.append(counts)
+            behavior_counts.append(row)
                         
                     
         return behavior_counts
 
                     
     def mutate(self):
+        """
+        Mutates each agent in the popultion.
+        """
         for i in range(self.width):
             for j in range(self.length):
                 for k in range(self.subpop_size):
                     self.population[i][j][k].mutate()
     def mate(self):
+        """
+        Individuals within each subpopulation can swap slices of their chromosome
+        with subpopulation mates.
+        """
         cfg = AppSettings()
         
         for i in range(self.width):
@@ -223,10 +253,11 @@ class Population:
             If chosen to migrate, the probability an agent survives migration. 
         """
         
-        self.play_game(interactions)
-        self.reproduce(fecundity, relative_fitnesses)
+        behavior_data = self.play_game(interactions)
+        fitness_data = self.reproduce(fecundity, relative_fitnesses)
         self.migrate(migration_distance, migration_survival)
         self.cull()
+        return {'behavior_data': behavior_data, 'fitness_data': fitness_data}
         
     def reset(self):
         """

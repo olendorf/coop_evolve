@@ -3,12 +3,14 @@
 
 import math
 import os
+import psycopg2
 import pytest
 
 from app_settings import AppSettings
 from os import listdir
 
 from coop_evolve.simulation_run import SimulationRun
+from coop_evolve.db_setup import DB_Setup
 
 class TestSimulationRunCreation:
     
@@ -24,7 +26,7 @@ class TestSimulationRunCreation:
         assert run.width == width
         assert run.length == length
         assert run.subpop_size == subpop_size
-        assert run.relative_fitnesses == True
+        assert run.relative_fitness == True
         assert run.migration_survival == 0.1
         assert run.migration_distance == 1
         assert run.initial_sequence == None
@@ -49,7 +51,7 @@ class TestSimulationRun:
         width = 5
         length = 4
         subpop_size = 3
-        generations = 100
+        generations = 10
         run = SimulationRun(
             width = width, 
             length = length, 
@@ -57,7 +59,7 @@ class TestSimulationRun:
             generations = generations
         )
         
-        run.run()
+        run.run(1)
         
         assert run.population.popsize() == width * length * subpop_size
         
@@ -65,11 +67,14 @@ class TestSimulationRun:
 class TestDataCollection:
 
     
-    def test_behavior_data(self):
+    def test_data_length(self):
+        
+        db = DB_Setup()
+        db.reset()
         width = 2
         length = 2
         subpop_size = 2
-        generations = 100
+        generations = 10
         run = SimulationRun(
             width = width, 
             length = length, 
@@ -77,7 +82,25 @@ class TestDataCollection:
             generations = generations
         )
         
-        run.run()
+        run_id = run.run(simulation_id = 1)
+        
+        
+        cfg = AppSettings()
+        
+        conn = psycopg2.connect(
+            f"dbname= '{cfg.database}' " + 
+            f"user='{cfg.db_user}' " + 
+            f"password={cfg.db_password} " + 
+            f"host=localhost"
+        )
+        cur = conn.cursor()
+        
+        
+        cur.execute(f"SELECT COUNT(*) FROM (SELECT * FROM test.subpop_data WHERE run_id = {run_id}) as foo")
+        
+        expected = cur.fetchall()[0][0]
+        
+        assert expected == width * length * generations
         
     
         

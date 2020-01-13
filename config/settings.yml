@@ -1,5 +1,5 @@
 database: coop_evolve
-schema: production
+schema_name: production
 db_user: coop_evolve
 db_password: password
 

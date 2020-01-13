@@ -3,6 +3,7 @@
 
 """Tests for `coop_evolve.population Population` class."""
 
+import collections
 import pytest
 import random
 
@@ -126,12 +127,8 @@ class TestPlayingGame:
         
         data = population.play_game()
         
-        print(data)
-        
-        assert data[0]["a"] >= 0
-        assert data[1]["x_coord"] == 0
-        assert data[1]["y_coord"] == 1
-        assert data[2]["d"] > 0
+        assert data[0][0]["a"] >= 0
+        assert data[0][1]["d"] > 0
                
 class TestReproduction:
     
@@ -213,6 +210,20 @@ class TestReproduction:
         # Again not sure the variacne, but this is close and results in mostly 
         # passing tests.
         assert expected_popsize - 1 < mean_popsize < expected_popsize + 1
+        
+    def test_return_value(self):
+        width = 2
+        length = 3
+        popsize = 4
+        
+        population = Population(width, length, popsize)
+        population.play_game()
+        data = population.reproduce()
+        
+        assert len(data) == width
+        assert len(data[0]) == length
+        assert data[0][0] >= 0
+        
         
             
 class TestMigration:
@@ -324,6 +335,23 @@ class TestGeneration:
         
         assert payoff_lengths > 0
         
+    # def test_return_value(self):  
+        
+    #     cfg = AppSettings()
+        
+    #     width = 2
+    #     length = 2
+    #     popsize = 2
+        
+    #     population = Population(width, length, popsize)
+        
+    #     data = population.generation()
+        
+    #     assert len(data) == width
+    #     assert len(data[0]) == length
+    #     assert len(data[0][0]) == len(cfg.behaviors)
+        
+        
 class TestReset:
     
     def test_agents_are_reset(self):        
@@ -353,6 +381,19 @@ class TestOtherMethods:
         """ Tests popsize returns the correct population size """
         population = Population(4, 4, 4)
         assert population.popsize() == 4 * 4 * 4
+        
+    def test_census(self):
+        """Tests that the census included the correct results"""
+        
+        population = Population(2, 2, 5)
+        population[0][0][0].dna.sequence = 'aaa'
+        population[0][0][1].dna.sequence = 'bbb'
+        population[0][0][2].dna.sequence = 'aaa'
+        population[0][0][3].dna.sequence = 'bbb'
+        population[0][0][4].dna.sequence = 'aaa'
+        
+        # data = population.cenus()
+        
         
         
             

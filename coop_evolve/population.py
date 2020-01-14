@@ -64,28 +64,32 @@ class Population:
             
         Returns
         -------
-        List[List[Dict]]
+        dict{subpop_counts: List[List[Dict]], pop_counts[Dict]
         A tally of how many times each behavior was exhibited by subpopulation.Agent
         
         Example (2 by 3 popluation):
         
-        [
-            [   
-                {'a': 0, 'b': 0, 'c': 16, 'd': 20}, 
-                {'a': 2, 'b': 4, 'c': 0, 'd': 20}, 
-                {'a': 0, 'b': 0, 'c': 0, 'd': 58}
-            ], 
-            [
-                {'a': 0, 'b': 0, 'c': 0, 'd': 96}, 
-                {'a': 22, 'b': 0, 'c': 0, 'd': 98},
-                {'a': 3, 'b': 20, 'c': 0, 'd': 53}
-            ]
-        ]
+        {
+            'subpop_counts': [
+                                [
+                                    {'a': 0, 'b': 20, 'c': 0, 'd': 28}, 
+                                    {'a': 0, 'b': 0, 'c': 1, 'd': 45}, 
+                                    {'a': 0, 'b': 0, 'c': 0, 'd': 84}], 
+                                [
+                                    {'a': 0, 'b': 0, 'c': 8, 'd': 22}, 
+                                    {'a': 0, 'b': 0, 'c': 0, 'd': 80}, 
+                                    {'a': 2, 'b': 48, 'c': 0, 'd': 48}]
+                                ], 
+            'pop_counts': {'a': 2, 'b': 68, 'c': 9, 'd': 307}
+        }
         
         """
         cfg = AppSettings()
         
         behavior_counts = []
+        pop_counts = {}
+        for h in range(len(cfg.behaviors)):
+            pop_counts[cfg.behaviors[h]] = 0
         
         for i in range(self.width):
             row = []
@@ -105,11 +109,13 @@ class Population:
                     for h in range(len(cfg.behaviors)):
                         counts[cfg.behaviors[h]] += \
                             (histories[0] + histories[1]).count(cfg.behaviors[h])
+                        pop_counts[cfg.behaviors[h]] += \
+                            (histories[0] + histories[1]).count(cfg.behaviors[h])
                 row.append(counts)
             behavior_counts.append(row)
                         
                     
-        return behavior_counts
+        return {'subpop_counts': behavior_counts, 'pop_counts': pop_counts}
 
                     
     def mutate(self):
@@ -257,7 +263,36 @@ class Population:
         fitness_data = self.reproduce(fecundity, relative_fitnesses)
         self.migrate(migration_distance, migration_survival)
         self.cull()
-        return {'behavior_data': behavior_data, 'fitness_data': fitness_data}
+        
+        return {
+            'behavior_data': behavior_data, 
+            'fitness_data': fitness_data
+        }
+        
+    def census(self):
+        subpop_data = []
+        pop_data = {}
+        
+        for i in range(self.width):
+            row = []
+            for j in range(self.length):
+                subpop_counts = {}
+                for k in range(self.subpop_size):
+                    if self.population[i][j][k].dna.sequence in subpop_counts:
+                        subpop_counts[self.population[i][j][k].dna.sequence] += 1
+                    else:
+                        subpop_counts[self.population[i][j][k].dna.sequence] = 1
+                        
+                    if self.population[i][j][k].dna.sequence in pop_data:
+                        pop_data[self.population[i][j][k].dna.sequence] += 1
+                    else:
+                        pop_data[self.population[i][j][k].dna.sequence] = 1
+                row.append(subpop_counts)
+            subpop_data.append(row)
+        
+        return({'subpop_data': subpop_data, 'pop_data': pop_data})
+                    
+                    
         
     def reset(self):
         """
@@ -285,6 +320,7 @@ class Population:
         data = []
         
         for i in range(self.width):
+            row = []
             for j in range(self.length):
                 relative_fitnesses = []
                 for k in range(self.subpop_size):
@@ -295,7 +331,7 @@ class Population:
                 else:
                     mean_fitness = sum(relative_fitnesses)/len(relative_fitnesses)
                     
-                data.append({"x_coord": i, "y_coord": j, "mean_fitness": mean_fitness})
+                row.append(mean_fitness)
                 
                 # Need to protect against dividing by zero if all the payoffs are zero.
                 # Since they are all equal (zero) assume each is equally likely to reproduce
@@ -311,7 +347,7 @@ class Population:
                     while rand > relative_fitnesses[index]:
                         index += 1
                     self.population[i][j].append(copy.deepcopy(self.population[i][j][index]))
-                    
+            data.append(row)        
         return data
                     
     def __reproduce_with_absolute_fitness(self, fecundity):
@@ -333,6 +369,7 @@ class Population:
         
         max_payoff = max(cfg.payoffs.values())
         for i in range(self.width):
+            row = []
             for j in range(self.length):
                 popsize = len(self.population[i][j])
                 fitnesses = []
@@ -341,7 +378,8 @@ class Population:
                     for _ in range(fecundity):
                         if random.random() <= self.population[i][j][k].fitness()/max_payoff:
                             self.population[i][j].append(copy.deepcopy(self.population[i][j][k]))
-                data.append( {"x_coord": i, "y_coord": j, "mean_fitness": (sum(fitnesses)/len(fitnesses))} )
+                row.append( sum(fitnesses)/len(fitnesses) )
+            data.append(row)
                 
                     
                     

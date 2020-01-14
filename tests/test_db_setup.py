@@ -85,7 +85,7 @@ class TestDBReset:
         )
         result = [item[0] for item in cur.fetchall()]
         result.sort()
-        expected = ['id', 'runid', 'x_coord', 'y_coord', 'mean_fitness', 'behavior', 'census']
+        expected = ['id', 'run_id', 'generation', 'x_coord', 'y_coord', 'mean_fitness', 'behavior', 'census']
         expected.sort()
         assert result == expected
                 

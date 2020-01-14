@@ -74,7 +74,7 @@ class TestDataCollection:
         width = 2
         length = 2
         subpop_size = 2
-        generations = 10
+        generations = 50
         run = SimulationRun(
             width = width, 
             length = length, 

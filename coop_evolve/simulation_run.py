@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import csv
+import json
 import os
 import psycopg2
 import sys
@@ -44,7 +45,6 @@ class SimulationRun:
                 
         
     def run(self, simulation_id = None):
-        print("entering methods")
         cfg = AppSettings()
         conn = psycopg2.connect(
             f"dbname= '{cfg.database}' " + 
@@ -53,8 +53,6 @@ class SimulationRun:
             f"host=localhost"
         )
         cur = conn.cursor()
-        
-        print("connected to db")
         
         if self.initial_sequence == None:
             query = f"INSERT INTO {cfg.schema_name}.runs (\
@@ -76,14 +74,11 @@ class SimulationRun:
                         {self.migration_distance}, {self.migration_survival}, \
                         {self.initial_sequence}\
                       )"
-        print(query)
         try:
             cur.execute(query)
         except psycopg2.Error as e:
             print('Unable to insert: ').format(e)
             sys.exit(1)
-        else:
-            print('Connected!')
         conn.commit()
         
         print("run inserted")
@@ -93,10 +88,7 @@ class SimulationRun:
         
         run_id = cur.fetchall()[0][0]
         
-        print(f"run id: {run_id}")
-        
         for g in range(self.generations):
-            print(f"generation: {g}")
             data = self.population.generation(
                 relative_fitnesses=self.relative_fitness,
                 interactions = cfg.interaction_length,
@@ -104,6 +96,8 @@ class SimulationRun:
                 migration_distance = self.migration_distance,
                 migration_survival = self.migration_survival
                 )
+                
+            census = self.population.census()
                   
             conn = psycopg2.connect(
                 f"dbname= '{cfg.database}' " + 
@@ -113,12 +107,17 @@ class SimulationRun:
             )
             cur = conn.cursor()
             for i in range(self.width):
-                for j in range(self.length):      
+                for j in range(self.length):   
                     
-                    query = f"INSERT INTO {cfg.schema_name}.subpop_data (run_id) \
-                            VALUES({run_id});"
+                    behaviors = json.dumps(data['behavior_data']['subpop_counts'][i][j])
+                    sequences = json.dumps(census['subpop_data'][i][j])
                     
-                    cur.execute(query)
+                    query = f"INSERT INTO {cfg.schema_name}.subpop_data (\
+                                    run_id, generation, x_coord, y_coord, mean_fitness, \
+                                    behavior, census) \
+                            VALUES(%s, %s, %s, %s, %s, %s, %s)"
+                    
+                    cur.execute(query, (run_id, g, i, j, data['fitness_data'][i][j], behaviors, sequences))
                     conn.commit()
             conn.close()
         return run_id

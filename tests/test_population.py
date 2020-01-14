@@ -127,8 +127,11 @@ class TestPlayingGame:
         
         data = population.play_game()
         
-        assert data[0][0]["a"] >= 0
-        assert data[0][1]["d"] > 0
+        assert data['subpop_counts'][0][0]["a"] >= 0
+        assert data['subpop_counts'][0][1]["d"] > 0
+        
+        assert data['pop_counts']['a'] >= 0
+        assert data['pop_counts']['d'] > 0
                
 class TestReproduction:
     
@@ -296,6 +299,32 @@ class TestCulling:
         population.cull()
         
         assert population.popsize() == width * length * popsize
+        
+class TestCensus:
+    
+    def test_census(self):
+        width = 4
+        length = 5
+        subpop_size = 6
+        
+        population = Population(length, width, subpop_size)
+        
+        population[0][0][0].dna.sequence = "aaaa"
+        population[0][0][1].dna.sequence = "aaaa"
+        population[0][0][4].dna.sequence = "aaaa"
+        population[0][0][5].dna.sequence = "aaaa"
+        population[0][1][0].dna.sequence = "aaaa"
+        population[0][1][3].dna.sequence = "aaaa"
+        population[0][2][0].dna.sequence = "aaaa"
+        population[1][0][0].dna.sequence = "aaaa"
+        population[1][0][1].dna.sequence = "aaaa"
+        population[0][3][0].dna.sequence = "aaaa"
+        
+        result = population.census()
+        
+        assert result['subpop_data'][0][0]['aaaa'] == 4
+        assert result['pop_data']['aaaa'] == 10
+        
         
 class TestGeneration:
     

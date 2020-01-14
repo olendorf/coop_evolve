@@ -67,7 +67,7 @@ class TestSimulationRun:
 class TestDataCollection:
 
     
-    def test_data_length(self):
+    def test_subpop_data_length(self):
         
         db = DB_Setup()
         db.reset()
@@ -101,6 +101,42 @@ class TestDataCollection:
         expected = cur.fetchall()[0][0]
         
         assert expected == width * length * generations
+    
+    def test_pop_data_length(self):
+    
+        db = DB_Setup()
+        db.reset()
+        width = 2
+        length = 2
+        subpop_size = 2
+        generations = 50
+        run = SimulationRun(
+            width = width, 
+            length = length, 
+            subpop_size = subpop_size, 
+            generations = generations
+        )
+        
+        run_id = run.run(simulation_id = 1)
+        
+        
+        cfg = AppSettings()
+        
+        conn = psycopg2.connect(
+            f"dbname= '{cfg.database}' " + 
+            f"user='{cfg.db_user}' " + 
+            f"password={cfg.db_password} " + 
+            f"host=localhost"
+        )
+        cur = conn.cursor()
+        
+        
+        cur.execute(f"SELECT COUNT(*) FROM (SELECT * FROM test.pop_data WHERE run_id = {run_id}) as foo")
+        
+        expected = cur.fetchall()[0][0]
+        
+        assert expected == generations
+            
         
     
         

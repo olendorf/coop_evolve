@@ -71,6 +71,14 @@ class DB_Setup:
                     behavior JSONB, \
                     census JSONB \
                 );\
+                CREATE TABLE IF NOT EXISTS {cfg.schema_name}.pop_data( \
+                    id    SERIAL PRIMARY KEY, \
+                    run_id INTEGER, \
+                    generation INTEGER, \
+                    mean_fitness REAL, \
+                    behavior JSONB, \
+                    census JSONB \
+                );\
                 CREATE TABLE IF NOT EXISTS {cfg.schema_name}.runs( \
                  id SERIAL PRIMARY KEY, \
                  simulation_id INTEGER, \

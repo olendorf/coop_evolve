@@ -108,17 +108,37 @@ class SimulationRun:
             cur = conn.cursor()
             for i in range(self.width):
                 for j in range(self.length):   
-                    
-                    behaviors = json.dumps(data['behavior_data']['subpop_counts'][i][j])
-                    sequences = json.dumps(census['subpop_data'][i][j])
+
                     
                     query = f"INSERT INTO {cfg.schema_name}.subpop_data (\
                                     run_id, generation, x_coord, y_coord, mean_fitness, \
                                     behavior, census) \
                             VALUES(%s, %s, %s, %s, %s, %s, %s)"
                     
-                    cur.execute(query, (run_id, g, i, j, data['fitness_data'][i][j], behaviors, sequences))
+                    cur.execute(query, 
+                                    (
+                                        run_id, g, i, j, 
+                                        data['fitness_data'][i][j], 
+                                        json.dumps(data['behavior_data']['subpop_counts'][i][j]), 
+                                        json.dumps(census['subpop_data'][i][j])
+                                    )
+                                )
                     conn.commit()
+            
+            query = f"INSERT INTO {cfg.schema_name}.pop_data(\
+                             run_id, generation, mean_fitness, behavior, census) \
+                      VALUES(%s, %s, %s, %s, %s)"
+                      
+            flat_fitness = [item for sublist in data['fitness_data'] for item in sublist]
+                      
+            cur.execute(query,
+                            (
+                                run_id, g, sum(flat_fitness)/len(flat_fitness),
+                                json.dumps(data['behavior_data']['pop_counts']),
+                                json.dumps(census['pop_data'])
+                            )
+                        )
+            conn.commit()
             conn.close()
         return run_id
             

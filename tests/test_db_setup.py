@@ -33,7 +33,7 @@ class TestDBSetup:
         
         result = [ table[0] for table in cur.fetchall() ]
         result.sort()
-        expected = ['runs', 'subpop_data', 'experiments']
+        expected = ['runs', 'subpop_data', 'experiments', 'pop_data']
         expected.sort()
         assert result == expected
         
@@ -62,7 +62,7 @@ class TestDBReset:
         
         result = [ table[0] for table in cur.fetchall() ]
         result.sort()
-        expected = ['runs', 'subpop_data', 'experiments']
+        expected = ['runs', 'subpop_data', 'experiments', 'pop_data']
         expected.sort()
         assert result == expected
         
@@ -109,6 +109,28 @@ class TestDBReset:
         result = [item[0] for item in cur.fetchall()]
         result.sort()
         expected = ['id', 'behaviors', 'gene_delimiter', 'wild_cards', 'chromosome_length', 'mutation_rate', 'crossover_rate', 'interaction_length']
+        expected.sort()
+        assert result == expected
+        
+    def test_pop_data_table(self):
+        cfg = AppSettings()
+        
+        setup = DB_Setup()
+        setup.reset()
+        
+        conn = psycopg2.connect(
+            f"dbname= '{cfg.database}' " + 
+            f"user='{cfg.db_user}' " + 
+            f"password={cfg.db_password} " + 
+            f"host=localhost"
+        )
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT column_name FROM information_schema.columns WHERE table_schema = 'test' AND table_name = 'pop_data'"
+        )
+        result = [item[0] for item in cur.fetchall()]
+        result.sort()
+        expected = ['id', 'run_id', 'generation', 'mean_fitness', 'behavior', 'census']
         expected.sort()
         assert result == expected
         

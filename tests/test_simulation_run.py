@@ -100,7 +100,7 @@ class TestDataCollection:
         
         expected = cur.fetchall()[0][0]
         
-        assert expected == width * length * generations
+        assert expected == width * length * generations/10
     
     def test_pop_data_length(self):
     
@@ -117,7 +117,7 @@ class TestDataCollection:
             generations = generations
         )
         
-        run_id = run.run(simulation_id = 1)
+        run_id = run.run(1)
         
         
         cfg = AppSettings()
@@ -135,7 +135,7 @@ class TestDataCollection:
         
         expected = cur.fetchall()[0][0]
         
-        assert expected == generations
+        assert expected == generations/10
             
         
     

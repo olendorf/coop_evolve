@@ -14,7 +14,7 @@ before_install:
   - "python setup.py install"
   
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'CREATE DATABASE coop_evolve;' -U postgres
   - psql -c "CREATE USER coop_evolve WITH PASSWORD 'password';" -U postgres
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors

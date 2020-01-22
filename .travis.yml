@@ -17,6 +17,7 @@ before_script:
   - psql -c 'CREATE DATABASE coop_evolve;' -U postgres
   - psql -c "CREATE USER coop_evolve WITH PASSWORD 'password'" -U postgres
   - psql -c "ALTER USER coop_evolve CREATEDB;" -U postgres
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE coop_evolve TO coop_evolve"
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: 
   - pip install -U tox-travis

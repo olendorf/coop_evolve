@@ -77,14 +77,15 @@ class SimulationRun:
                         {simulation_id}, {self.generations}, {self.width}, {self.length}, \
                         {self.subpop_size}, {self.relative_fitness}, \
                         {self.migration_distance}, {self.migration_survival}, \
-                        {self.initial_sequence}\
+                        '{self.initial_sequence}'\
                       )"
         print("query created")
+        print(query)
         try:
             cur.execute(query)
             print("query exectued")
-        except psycopg2.Error as e:
-            print('Unable to insert: ').format(e)
+        except psycopg2.Error as e:     # pragma: no cover
+            print(f"Unable to insert: {e}")
             sys.exit(1)
         conn.commit()
         

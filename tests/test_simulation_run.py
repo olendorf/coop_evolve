@@ -63,6 +63,26 @@ class TestSimulationRun:
         
         assert run.population.popsize() == width * length * subpop_size
         
+    def test_specific_sequence(self):
+        width = 5
+        length = 4
+        subpop_size = 3
+        generations = 10
+        run = SimulationRun(
+            width = width, 
+            length = length, 
+            subpop_size = subpop_size, 
+            generations = generations,
+            initial_sequence = 'aaaa'
+        )
+        
+        assert run.population[0][0][0].dna.sequence == 'aaaa'
+        
+        run.run(1)
+        
+        assert run.population.popsize() == width * length * subpop_size
+        
+        
 
 class TestDataCollection:
 

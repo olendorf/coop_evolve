@@ -26,10 +26,9 @@ class Reporter:
             
         print(cfg)
         print(listdir('.'))
-        print(listdir('temp'))
-        print(listdir('reports'))
+        print(listdir(cfg.report_directory))
             
-        f = open( "reports/_" + str(int(time.time())) + ".txt", "w")
+        f = open( cfg.report_directory + "/_" + str(int(time.time())) + ".txt", "w")
         f.write(
             "==========================\n" + 
             "==========================\n" +

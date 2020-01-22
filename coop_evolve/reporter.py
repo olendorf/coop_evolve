@@ -8,6 +8,7 @@ import time
 
 from app_settings import AppSettings
 from coop_evolve.chromosome import Chromosome
+from os import listdir
 
 
 
@@ -18,10 +19,16 @@ class Reporter:
         dna = Chromosome()
         cfg = AppSettings()
         
-        if not os.path.exists("reports"):  # pragma: no cover
-            os.makedirs("reports")
+        print("making files")
+        
+        if not os.path.exists(cfg.report_directory):  # pragma: no cover
+            os.makedirs(cfg.report_directory)
             
-        f = open( "reports/_" + str(int(time.time())) + ".txt", "w")
+        print(cfg)
+        print(listdir('.'))
+        print(listdir(cfg.report_directory))
+            
+        f = open( cfg.report_directory + "/_" + str(int(time.time())) + ".txt", "w")
         f.write(
             "==========================\n" + 
             "==========================\n" +

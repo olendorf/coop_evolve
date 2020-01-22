@@ -3,6 +3,7 @@
 
 """Tests for `coop_evolve.population Population` class."""
 
+import collections
 import pytest
 import random
 
@@ -89,6 +90,9 @@ class TestPlayingGame:
         population = Population(width, length, subpop_size)
         
         population.play_game(expected_interactions)
+        
+               
+        assert population.popsize() == width * length * subpop_size
         payoff_lengths = []
         for i in range(width):
             for j in range(length):
@@ -113,6 +117,21 @@ class TestPlayingGame:
         assert (expected_payoff_length - conf_99) < \
                mean_payoff_length < \
                (expected_payoff_length + conf_99)
+    
+    def test_data_collection(self):
+        width = 2
+        length = 2
+        subpop_size = 10
+        
+        population = Population(width, length, subpop_size)
+        
+        data = population.play_game()
+        
+        assert data['subpop_counts'][0][0]["a"] >= 0
+        assert data['subpop_counts'][0][1]["d"] > 0
+        
+        assert data['pop_counts']['a'] >= 0
+        assert data['pop_counts']['d'] > 0
                
 class TestReproduction:
     
@@ -195,6 +214,20 @@ class TestReproduction:
         # passing tests.
         assert expected_popsize - 1 < mean_popsize < expected_popsize + 1
         
+    def test_return_value(self):
+        width = 2
+        length = 3
+        popsize = 4
+        
+        population = Population(width, length, popsize)
+        population.play_game()
+        data = population.reproduce()
+        
+        assert len(data) == width
+        assert len(data[0]) == length
+        assert data[0][0] >= 0
+        
+        
             
 class TestMigration:
     """ Test migration is accurate """
@@ -267,6 +300,32 @@ class TestCulling:
         
         assert population.popsize() == width * length * popsize
         
+class TestCensus: 
+    
+    def test_census(self):
+        width = 4
+        length = 5
+        subpop_size = 6
+        
+        population = Population(length, width, subpop_size)
+        
+        population[0][0][0].dna.sequence = "aaaa"
+        population[0][0][1].dna.sequence = "aaaa"
+        population[0][0][4].dna.sequence = "aaaa"
+        population[0][0][5].dna.sequence = "aaaa"
+        population[0][1][0].dna.sequence = "aaaa"
+        population[0][1][3].dna.sequence = "aaaa"
+        population[0][2][0].dna.sequence = "aaaa"
+        population[1][0][0].dna.sequence = "aaaa"
+        population[1][0][1].dna.sequence = "aaaa"
+        population[0][3][0].dna.sequence = "aaaa"
+        
+        result = population.census()
+        
+        assert result['subpop_data'][0][0]['aaaa'] == 4
+        assert result['pop_data']['aaaa'] == 10
+        
+        
 class TestGeneration:
     
     def test_population_stability(self):
@@ -305,6 +364,23 @@ class TestGeneration:
         
         assert payoff_lengths > 0
         
+    # def test_return_value(self):  
+        
+    #     cfg = AppSettings()
+        
+    #     width = 2
+    #     length = 2
+    #     popsize = 2
+        
+    #     population = Population(width, length, popsize)
+        
+    #     data = population.generation()
+        
+    #     assert len(data) == width
+    #     assert len(data[0]) == length
+    #     assert len(data[0][0]) == len(cfg.behaviors)
+        
+        
 class TestReset:
     
     def test_agents_are_reset(self):        
@@ -334,6 +410,19 @@ class TestOtherMethods:
         """ Tests popsize returns the correct population size """
         population = Population(4, 4, 4)
         assert population.popsize() == 4 * 4 * 4
+        
+    def test_census(self):
+        """Tests that the census included the correct results"""
+        
+        population = Population(2, 2, 5)
+        population[0][0][0].dna.sequence = 'aaa'
+        population[0][0][1].dna.sequence = 'bbb'
+        population[0][0][2].dna.sequence = 'aaa'
+        population[0][0][3].dna.sequence = 'bbb'
+        population[0][0][4].dna.sequence = 'aaa'
+        
+        # data = population.cenus()
+        
         
         
             

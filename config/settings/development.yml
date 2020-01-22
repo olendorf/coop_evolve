@@ -1,4 +1,8 @@
-  
+database: coop_evolve
+schema_name: test
+db_user: coop_evolve
+db_password: password
+
 behaviors: abcd          # the possible plays an agent can make
                          # the last behavior is the default
                          
@@ -19,6 +23,8 @@ interaction_length: 10  # Expected number of plays when two agents play a game
 
 migration_survival: 0.1 # Expected probability of surviving a migration
 
+mating_rate: 1 # How many times an agent is expected to mate (crossing over not reproduce)
+
 # The payoffs for the given behavior matches. The first character is the 
 # opponents play, the second the focal agent. If there is no match
 # the payoff is assumed to be zero.
@@ -27,3 +33,8 @@ payoffs:
     cc: 7
     dc: 0
     cd: 10
+
+data_frequency: 10               # How often to collect and write data.
+
+data_directory: "temp/data"     # The direcotry to store data in 
+report_directory: "temp/reports"     # The directory to store reports in 

@@ -4,6 +4,7 @@
 """Tests for `coop_evolve.agent Agent` class."""
 
 import pytest
+import re
 
 from app_settings import AppSettings
 
@@ -149,6 +150,17 @@ class TestAgentInteraction:
         assert expected_fitness2 - conf_99 < fitness2 < expected_fitness2 + conf_99
             
                 
+    def test_interaction_data_return(self):
+        cfg = AppSettings()
+        
+        agent1 = Agent("*d:d/*:c/")
+        agent2 = Agent("*:d/")
+        data = Agent.interact(agent1, agent2)
+        
+        assert re.match("^c[d]*", data[0])
+        assert re.match("^[d]*", data[1])
+
+        
         
             
 
@@ -188,5 +200,24 @@ class TestReset:
         agent.reset()
         
         assert len(agent.payoffs) == 0
+        
+class TestPassThroughMethods:
+    """ Test methods that pass through to chromosome """
+    
+    def test_mutations(self):
+        """ Simple test for agent mutations """
+        agent = Agent("a"*100)
+        agent.mutate()
+        assert agent.dna.sequence != "a"*100
+        
+    def test_mate(self):
+        """ Simple test for mating """
+        agent1 = Agent("a"*100)
+        agent2 = Agent("b"*100)
+        
+        Agent.mate(agent1, agent2)
+        
+        assert agent1.dna.sequence != "a"*100
+
         
         

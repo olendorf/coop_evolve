@@ -3,7 +3,10 @@
 
 """Tests for `coop_evolve` package."""
 
+import os
 import pytest
+
+from app_settings import AppSettings
 
 from click.testing import CliRunner
 
@@ -42,3 +45,8 @@ def test_reporter_cli():
     result = runner.invoke(cli.main, ['report'])
     assert result.exit_code == 0
     assert "reporting" in result.output
+    cfg = AppSettings()
+    try:
+        os.system('rm -rf ' + cfg.report_directory)
+    except:
+        pass

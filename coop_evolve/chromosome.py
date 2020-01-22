@@ -35,11 +35,12 @@ class Chromosome:
            
         cfg = AppSettings()
         num = poisson.rvs(cfg.mutation_rate * len(self.sequence))
-        positions = nrand.randint(0, len(self.sequence), size=num)
-        for pos in positions:
-            self.sequence = self.sequence[:pos] + \
-                            random.choice(self.nucleotides()) + \
-                            self.sequence[(pos + 1):]
+        if len(self.sequence) > 0:
+            positions = nrand.randint(0, len(self.sequence), size=num)
+            for pos in positions:
+                self.sequence = self.sequence[:pos] + \
+                                random.choice(self.nucleotides()) + \
+                                self.sequence[(pos + 1):]
                             
     def deletion(self):
         """
@@ -113,7 +114,12 @@ class Chromosome:
                         self.sequence[pos:(pos + length)][::-1] + \
                         self.sequence[(pos + length):]
                         
-        
+    
+    def mutate(self):
+        self.substitutions()
+        self.insertion()
+        self.deletion()
+        self.inversion()
         
 
         
@@ -137,13 +143,16 @@ class Chromosome:
         cfg = AppSettings()
         min_len =  len(min([dna1.sequence, dna2.sequence], key=len)) 
         num = poisson.rvs(cfg.crossover_rate * min_len)
-             
-        positions = nrand.randint(0, min_len , size=num)
         
-        for pos in positions:
-            seq1 = dna1.sequence
-            dna1.sequence = dna1.sequence[:pos] + dna2.sequence[pos:]
-            dna2.sequence = dna2.sequence[:pos] + seq1[pos:]
+        if min_len > 0:
+            
+             
+            positions = nrand.randint(0, min_len , size=num)
+            
+            for pos in positions:
+                seq1 = dna1.sequence
+                dna1.sequence = dna1.sequence[:pos] + dna2.sequence[pos:]
+                dna2.sequence = dna2.sequence[:pos] + seq1[pos:]
         
 
     @staticmethod

@@ -61,11 +61,42 @@ class Population:
             The number of interactions per agent. If interactions = 2, and there are
             10 agents in the population, then there are 20 interactions and each agent
             is expected to take part in 40 interactions. 
+            
+        Returns
+        -------
+        dict{subpop_counts: List[List[Dict]], pop_counts[Dict]
+        A tally of how many times each behavior was exhibited by subpopulation.Agent
+        
+        Example (2 by 3 popluation):
+        
+        {
+            'subpop_counts': [
+                                [
+                                    {'a': 0, 'b': 20, 'c': 0, 'd': 28}, 
+                                    {'a': 0, 'b': 0, 'c': 1, 'd': 45}, 
+                                    {'a': 0, 'b': 0, 'c': 0, 'd': 84}], 
+                                [
+                                    {'a': 0, 'b': 0, 'c': 8, 'd': 22}, 
+                                    {'a': 0, 'b': 0, 'c': 0, 'd': 80}, 
+                                    {'a': 2, 'b': 48, 'c': 0, 'd': 48}]
+                                ], 
+            'pop_counts': {'a': 2, 'b': 68, 'c': 9, 'd': 307}
+        }
+        
         """
         cfg = AppSettings()
         
+        behavior_counts = []
+        pop_counts = {}
+        for h in range(len(cfg.behaviors)):
+            pop_counts[cfg.behaviors[h]] = 0
+        
         for i in range(self.width):
+            row = []
             for j in range(self.length):
+                counts = {}
+                for h in range(len(cfg.behaviors)):
+                    counts[cfg.behaviors[h]] = 0
                 for _ in range(interactions * self.subpop_size):
                     index1 = random.randint(0, (self.subpop_size - 1))
                     index2 = random.randint(0, (self.subpop_size - 1))
@@ -73,7 +104,45 @@ class Population:
                         index2 = random.randint(0, self.subpop_size - 1)
                     agent1 = self.population[i][j][index1]
                     agent2 = self.population[i][j][index2]
-                    Agent.interact(agent1, agent2)
+                    histories = Agent.interact(agent1, agent2)
+                    
+                    for h in range(len(cfg.behaviors)):
+                        counts[cfg.behaviors[h]] += \
+                            (histories[0] + histories[1]).count(cfg.behaviors[h])
+                        pop_counts[cfg.behaviors[h]] += \
+                            (histories[0] + histories[1]).count(cfg.behaviors[h])
+                row.append(counts)
+            behavior_counts.append(row)
+                        
+                    
+        return {'subpop_counts': behavior_counts, 'pop_counts': pop_counts}
+
+                    
+    def mutate(self):
+        """
+        Mutates each agent in the population.
+        """
+        for i in range(self.width):
+            for j in range(self.length):
+                for k in range(self.subpop_size):
+                    self.population[i][j][k].mutate()
+    def mate(self):
+        """
+        Individuals within each subpopulation can swap slices of their chromosome
+        with subpopulation mates.
+        """
+        cfg = AppSettings()
+        
+        for i in range(self.width):
+            for j in range(self.length):
+                for _ in range(int(round(self.subpop_size * cfg.mating_rate * 0.5))):
+                    index1 = random.randint(0, (self.subpop_size - 1))
+                    index2 = random.randint(0, (self.subpop_size - 1))
+                    while index1 == index2:
+                        index2 = random.randint(0, self.subpop_size - 1)
+                    agent1 = self.population[i][j][index1]
+                    agent2 = self.population[i][j][index2]
+                    Agent.mate(agent1, agent2)
 
     def reproduce(self, fecundity = 1, relative_fitnesses = True):
         """
@@ -97,9 +166,10 @@ class Population:
         """
         
         if(relative_fitnesses):
-            self.__reproduce_with_relative_fitness(fecundity)
+            return self.__reproduce_with_relative_fitness(fecundity)
         else:
-            self.__reproduce_with_absolute_fitness(fecundity)
+            return self.__reproduce_with_absolute_fitness(fecundity)
+            
             
     def migrate(self, survival=0.1, distance=1):
         """
@@ -184,10 +254,42 @@ class Population:
             If chosen to migrate, the probability an agent survives migration. 
         """
         
-        self.play_game(interactions)
-        self.reproduce(fecundity, relative_fitnesses)
+        behavior_data = self.play_game(interactions)
+        self.mutate()
+        fitness_data = self.reproduce(fecundity, relative_fitnesses)
         self.migrate(migration_distance, migration_survival)
         self.cull()
+        self.mate()
+        
+        return {
+            'behavior_data': behavior_data, 
+            'fitness_data': fitness_data
+        }
+        
+    def census(self):
+        subpop_data = []
+        pop_data = {}
+        
+        for i in range(self.width):
+            row = []
+            for j in range(self.length):
+                subpop_counts = {}
+                for k in range(self.subpop_size):
+                    if self.population[i][j][k].dna.sequence in subpop_counts:
+                        subpop_counts[self.population[i][j][k].dna.sequence] += 1
+                    else:
+                        subpop_counts[self.population[i][j][k].dna.sequence] = 1
+                        
+                    if self.population[i][j][k].dna.sequence in pop_data:
+                        pop_data[self.population[i][j][k].dna.sequence] += 1
+                    else:
+                        pop_data[self.population[i][j][k].dna.sequence] = 1
+                row.append(subpop_counts)
+            subpop_data.append(row)
+        
+        return({'subpop_data': subpop_data, 'pop_data': pop_data})
+                    
+                    
         
     def reset(self):
         """
@@ -212,11 +314,21 @@ class Population:
             The number of agents produced per agent in a subpopulation.
         """
         
+        data = []
+        
         for i in range(self.width):
+            row = []
             for j in range(self.length):
                 relative_fitnesses = []
                 for k in range(self.subpop_size):
                     relative_fitnesses.append(self.population[i][j][k].fitness())
+                    
+                if sum(relative_fitnesses) == 0:
+                    mean_fitness = 1/len(relative_fitnesses)
+                else:
+                    mean_fitness = sum(relative_fitnesses)/len(relative_fitnesses)
+                    
+                row.append(mean_fitness)
                 
                 # Need to protect against dividing by zero if all the payoffs are zero.
                 # Since they are all equal (zero) assume each is equally likely to reproduce
@@ -232,6 +344,8 @@ class Population:
                     while rand > relative_fitnesses[index]:
                         index += 1
                     self.population[i][j].append(copy.deepcopy(self.population[i][j][index]))
+            data.append(row)        
+        return data
                     
     def __reproduce_with_absolute_fitness(self, fecundity):
         """
@@ -247,18 +361,26 @@ class Population:
         """
         
         cfg = AppSettings()
+        
+        data = []
+        
         max_payoff = max(cfg.payoffs.values())
         for i in range(self.width):
+            row = []
             for j in range(self.length):
                 popsize = len(self.population[i][j])
-                for _ in range(fecundity):
-                    for k in range(popsize):
+                fitnesses = []
+                for k in range(popsize):
+                    fitnesses.append(self.population[i][j][k].fitness()/max_payoff)
+                    for _ in range(fecundity):
                         if random.random() <= self.population[i][j][k].fitness()/max_payoff:
                             self.population[i][j].append(copy.deepcopy(self.population[i][j][k]))
+                row.append( sum(fitnesses)/len(fitnesses) )
+            data.append(row)
                 
                     
                     
-                        
+        return data                
                     
             
     def __getitem__(self, key):

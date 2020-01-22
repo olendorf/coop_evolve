@@ -1,3 +1,8 @@
+database: coop_evolve
+schema_name: production
+db_user: coop_evolve
+db_password: password
+
 
 behaviors: abcd          # the possible plays an agent can make
                          # the last behavior is the default
@@ -20,6 +25,8 @@ interaction_length: 10  # Expected number of plays when two agents play a game
 
 migration_survival: 0.1 # Expected probability of surviving a migration
 
+mating_rate: 1 # How many times an agent is expected to mate (crossing over not reproduce)
+
 # If relative fitness is used, a subpopulation produces fecundity * subpopsize new agents
 # each generation. The proportion of new agents contributed by an existing agent is 
 # proportional to its fitness relative to others in the subpopulatoin. fitness/sum_of_fitnesses.
@@ -35,4 +42,8 @@ payoffs:
     cc: 7
     dc: 0
     cd: 10
+    
+data_frequency: 10              # How often to collect and write data.
+data_directory: "data"          # The directory to store the output data in
+report_directory: "reports"     # the directory to store reports in 
     

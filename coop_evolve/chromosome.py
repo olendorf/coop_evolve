@@ -35,11 +35,12 @@ class Chromosome:
            
         cfg = AppSettings()
         num = poisson.rvs(cfg.mutation_rate * len(self.sequence))
-        positions = nrand.randint(0, len(self.sequence), size=num)
-        for pos in positions:
-            self.sequence = self.sequence[:pos] + \
-                            random.choice(self.nucleotides()) + \
-                            self.sequence[(pos + 1):]
+        if len(self.sequence) > 0:
+            positions = nrand.randint(0, len(self.sequence), size=num)
+            for pos in positions:
+                self.sequence = self.sequence[:pos] + \
+                                random.choice(self.nucleotides()) + \
+                                self.sequence[(pos + 1):]
                             
     def deletion(self):
         """

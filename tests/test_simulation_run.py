@@ -45,7 +45,7 @@ class TestSimulationRunCreation:
         assert len(simulation.population[0]) == length
         assert len(simulation.population[0][0]) == subpop_size
         
-# class TestSimulationRun:
+class TestSimulationRun:
 
 #     def test_stable_population_size(self):
 #         width = 5
@@ -63,24 +63,24 @@ class TestSimulationRunCreation:
         
 #         assert run.population.popsize() == width * length * subpop_size
         
-#     def test_specific_sequence(self):
-#         width = 5
-#         length = 4
-#         subpop_size = 3
-#         generations = 10
-#         run = SimulationRun(
-#             width = width, 
-#             length = length, 
-#             subpop_size = subpop_size, 
-#             generations = generations,
-#             initial_sequence = 'aaaa'
-#         )
+    def test_specific_sequence(self):
+        width = 5
+        length = 4
+        subpop_size = 3
+        generations = 10
+        run = SimulationRun(
+            width = width, 
+            length = length, 
+            subpop_size = subpop_size, 
+            generations = generations,
+            initial_sequence = 'aaaa'
+        )
         
-#         assert run.population[0][0][0].dna.sequence == 'aaaa'
+        assert run.population[0][0][0].dna.sequence == 'aaaa'
         
-#         run.run(1)
+        run.run(simulation_id = 1)
         
-#         assert run.population.popsize() == width * length * subpop_size
+        assert run.population.popsize() == width * length * subpop_size
         
         
 

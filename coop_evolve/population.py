@@ -120,7 +120,7 @@ class Population:
                     
     def mutate(self):
         """
-        Mutates each agent in the popultion.
+        Mutates each agent in the population.
         """
         for i in range(self.width):
             for j in range(self.length):
@@ -170,11 +170,6 @@ class Population:
         else:
             return self.__reproduce_with_absolute_fitness(fecundity)
             
-    def mutations(self):
-        for i in range(self.width):
-            for j in range(self.length):
-                for k in range(self.subpop_size):
-                    self.population[i][j][k].mutations()
             
     def migrate(self, survival=0.1, distance=1):
         """
@@ -260,9 +255,11 @@ class Population:
         """
         
         behavior_data = self.play_game(interactions)
+        self.mutate()
         fitness_data = self.reproduce(fecundity, relative_fitnesses)
         self.migrate(migration_distance, migration_survival)
         self.cull()
+        self.mate()
         
         return {
             'behavior_data': behavior_data, 

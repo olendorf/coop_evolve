@@ -300,7 +300,7 @@ class TestCulling:
         
         assert population.popsize() == width * length * popsize
         
-class TestCensus:
+class TestCensus: 
     
     def test_census(self):
         width = 4
